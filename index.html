@@ -1,0 +1,333 @@
+<!DOCTYPE HTML>
+<html>
+	<head>
+		<style>
+			html, body {
+				border:0; margin:0; padding:0;
+				width:100%; height:100%;
+				overflow: hidden;
+				background: #000;
+			}
+		</style>
+		<script src="lib/3.js"></script>
+		<script src="lib/TeapotGeometry.js"></script>
+	</head>
+	<body>
+		<script>
+			var box = new THREE.Box3(
+				new THREE.Vector3(-500,-500,-500),
+				new THREE.Vector3(500,500,500)
+			);
+			box.randomPoint = function(){
+				return new THREE.Vector3(
+					rand(this.min.x, this.max.x),
+					rand(this.min.y, this.max.y),
+					rand(this.min.z, this.max.z)
+				);
+			};
+			var cylinderBetweenPoints = function(point1, point2, material){
+				var direction = new THREE.Vector3().subVectors(point2, point1);
+				var arrow = new THREE.ArrowHelper(direction.clone().normalize(), point1);
+				
+				var geom = new THREE.CylinderGeometry(10, 10, direction.length()-20*0, 10, 4, true);
+				var mesh = new THREE.Mesh(geom, material);
+				
+				mesh.rotation.setFromQuaternion(arrow.quaternion);
+				mesh.position = new THREE.Vector3().addVectors(point1, direction.multiplyScalar(0.5));
+				mesh.updateMatrix();
+				return mesh;
+			};
+			var textures = {};
+			//var tptextures = {};
+			var Pipe = function(scene, o){
+				var p = this;
+				p.pos = box.randomPoint();
+				p.o3d = new THREE.Object3D();
+				scene.add(p.o3d);
+				if(o.texture){
+					p.mat = new THREE.MeshLambertMaterial({
+						map: textures[o.texture]
+					});
+				}else{
+					var color = '#'+Math.floor(rand(0,0xFFFFFF)).toString(16);
+					var emissive = new THREE.Color(color).multiplyScalar(0.3);
+					p.mat = new THREE.MeshPhongMaterial({
+						// light
+						specular: '#a9fcff',
+						// intermediate
+						color: color,
+						// dark
+						emissive: emissive,
+						shininess: 100 
+					});
+				}
+				var elbow;
+				p.update = function(){
+					var dist = Math.floor(rand(1,5))*50;
+					var newpos = p.pos.clone();
+					if(perchance(100/2)){
+						if(perchance(100/3)){
+							newpos.x += dist;
+						}else if(perchance(100/2)){
+							newpos.y += dist;
+						}else{
+							newpos.z += dist;
+						}
+					}else{
+						if(perchance(100/3)){
+							newpos.x -= dist;
+						}else if(perchance(100/2)){
+							newpos.y -= dist;
+						}else{
+							newpos.z -= dist;
+						}
+					}
+					if(!box.containsPoint(newpos)){
+						return;
+					}
+					//pipe
+					var cylinder = cylinderBetweenPoints(p.pos, newpos, p.mat);
+					cylinder.overdraw = true;
+					p.o3d.add(cylinder);
+					
+					//
+					if(elbow){
+						//elbow.rotateX(Math.PI);
+						//elbow.rotation = ;
+						p.o3d.add(elbow);
+					}
+					
+					//joint
+					if(perchance(0.5+options.TEAPOTS*5)){
+						//THREE.TeapotGeometry=function(size,segments,bottom,lid,body,fitLid,blinn);
+						//var tptex = textures[o.texture].clone();
+						//tptex.repeat.set(1,1);
+						var teapot = new THREE.Mesh(
+							new THREE.TeapotGeometry(15, true, true, true, true, true), 
+							p.mat
+							//new THREE.MeshLambertMaterial({map: tptex})
+						);
+						teapot.position = p.pos.clone();
+						teapot.rotation.x = Math.floor(rand(0,50))*Math.PI/2;
+						teapot.rotation.y = Math.floor(rand(0,50))*Math.PI/2;
+						teapot.rotation.z = Math.floor(rand(0,50))*Math.PI/2;
+						p.o3d.add(teapot);
+					}else if(perchance(20)){
+						//ball
+						var ball = new THREE.Mesh(new THREE.SphereGeometry(15, 8, 8), p.mat);
+						ball.position = p.pos.clone();
+						p.o3d.add(ball);
+					}else{
+						//elbow
+						//var r = 20;
+						//elbow = new THREE.Mesh(new THREE.TorusGeometry(r, 10, 8, 8, Math.PI/2), p.mat);
+						//elbow.position = p.pos.clone();
+						
+						//elball
+						var elball = new THREE.Mesh(new THREE.SphereGeometry(10, 8, 8), p.mat);
+						elball.position = p.pos.clone();
+						p.o3d.add(elball);
+					}
+					
+					//finish
+					p.pos = newpos;
+					
+				};
+				p.clear = function(){
+					scene.remove(p.o3d);
+				};
+			};
+			
+			/*var WanderingLight = function(scene){
+				var wl = this;
+				wl.v3 = box.randomPoint();
+				wl.v32 = box.randomPoint();
+				
+				var light = new THREE.SpotLight(0xffffff, 0.9);
+				//var light = new THREE.PointLight( 0xff0000, 1, 100 );
+				light.position = wl.v3;
+				
+				light.castShadow = true;
+				
+				light.shadowMapWidth = 1024;
+				light.shadowMapHeight = 1024;
+				
+				light.shadowCameraNear = 500;
+				light.shadowCameraFar = 4000;
+				light.shadowCameraFov = 30;
+				
+				scene.add(light);
+				
+				
+				wl.update = function(){
+					if(perchance(100/1000)){
+						wl.v32 = box.randomPoint();
+					}
+					var s = 0.05;
+					wl.v3.x += (wl.v3.x-wl.v32.x)*s;
+					wl.v3.y += (wl.v3.y-wl.v32.y)*s;
+					wl.v3.z += (wl.v3.z-wl.v32.z)*s;
+					
+					light.position = wl.v3;
+					light.position.multiplyScalar(0.5);
+					
+				};
+			};*/
+			
+			var pipes = [];
+			var time = 0;
+			var options = {
+				multiple: true,
+				texture: false,
+				joints: "mixed",
+				speed: 1,
+				TEAPOTS: 0
+			};
+			// renderer
+			var renderer = new THREE.WebGLRenderer({ clearColor: 0x000000, clearAlpha: 1, antialias: true });
+			renderer.setSize(window.innerWidth, window.innerHeight);
+			document.body.appendChild(renderer.domElement);
+			
+			// camera
+			var camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 1, 100000);
+			look();
+			
+			// scene
+			var scene = new THREE.Scene();
+			
+			// lighting
+			var ambientLight = new THREE.AmbientLight(0x111111);
+			scene.add(ambientLight);            
+			
+			var directionalLightL = new THREE.DirectionalLight(0xffffff, 0.9);
+			directionalLightL.position.set(-1.2, 1.5, 0.5);
+			scene.add(directionalLightL);
+			
+			//var wanderingLight = new WanderingLight(scene);
+			//var wanderingLight2 = new WanderingLight(scene);
+			
+			
+			// this function is executed on each animation frame
+			var clearing = false;
+			function animate(){
+				if(options.texture && !textures[options.texture]){
+					var t = THREE.ImageUtils.loadTexture(options.texture);
+					t.wrapS = t.wrapT = THREE.RepeatWrapping;
+					t.repeat.set(2,2);
+					textures[options.texture] = t;
+				}
+				// update
+				time++;
+				if(!clearing && ((perchance(1) && time>200) || (time>5000))){
+					clearing = true;
+					var t = (time>504309) ? 100 : 2000;
+					renderer.domElement.style.transition = 
+					renderer.domElement.style.oTransition = 
+					renderer.domElement.style.mozTtransition = 
+					renderer.domElement.style.webkitTransition = "opacity "+t+"ms ease-in-out";
+					renderer.domElement.style.opacity = 0;
+					setTimeout(function(){
+						for(var i=0; i<pipes.length; i++){
+							pipes[i].clear();
+						}
+						pipes = [];
+						time = 0;
+						look();
+						clearing = false;
+						renderer.domElement.style.transition = 
+						renderer.domElement.style.oTransition = 
+						renderer.domElement.style.mozTtransition = 
+						renderer.domElement.style.webkitTransition = "opacity 0.5s ease-in-out";
+						renderer.domElement.style.opacity = 1;
+					},t+10);
+				}
+				for(var i=0; i<pipes.length; i++){
+					pipes[i].update(scene);
+				}
+				if(pipes.length === 0){
+					var o = options;
+					if(perchance(5)){
+						o = JSON.parse(JSON.stringify(options));
+						o.TEAPOTS = 1; o.texture = "candycane.png";
+						if(!textures[o.texture]){
+							var t = THREE.ImageUtils.loadTexture(o.texture);
+							t.wrapS = t.wrapT = THREE.RepeatWrapping;
+							t.repeat.set(2,2);
+							textures[o.texture] = t;
+						}
+					}
+					for(var i=0; i<1+options.multiple*(1+perchance(10)); i++){
+						pipes.push(new Pipe(scene,o));
+					}
+				}
+				
+				//wanderingLight.update();
+				//anderingLight2.update();
+				
+				// render
+				renderer.render(scene, camera);
+ 				
+				// request new frame
+				requestAnimationFrame(function(){
+					animate();
+				});
+			}
+			
+			function look(){
+				if(perchance(50)){
+					//head-on view
+					camera.position = new THREE.Vector3(0, 0, 700);
+				}else{
+					//random view
+					
+					var vector = new THREE.Vector3(700, 0, 0);
+					
+					var axis = new THREE.Vector3(rand(-1,1), rand(-1,1), rand(-1,1));
+					var angle = Math.PI / 2;
+					var matrix = new THREE.Matrix4().makeRotationAxis(axis, angle);
+					
+					vector.applyMatrix4( matrix );
+					camera.position = vector;
+				}
+				var center = new THREE.Vector3(0,0,0);
+				camera.lookAt(center);
+			}
+			
+			addEventListener('resize', function(){
+				renderer.setSize(window.innerWidth, window.innerHeight);
+				camera.aspect = window.innerWidth / window.innerHeight;
+				camera.updateProjectionMatrix();
+				
+			}, false);
+			addEventListener('mousedown', function(e){
+				if(e.button){
+					time = 4350983;
+				}else{
+					look();
+				}
+			}, false);
+			addEventListener('contextmenu', function(e){
+				e.preventDefault();
+				return false;
+			}, false);
+			
+			// start animation
+			animate();
+			
+			/**************\
+			|boring helpers|
+			\**************/
+			function rand(x1,x2){
+				return Math.random()*(x2-x1)+x1;
+			}
+			function perchance(percent){
+				return rand(0,100) < percent;
+			}
+			function choose(a){
+				if(!(a instanceof Array) && (typeof a!="string" || arguments.length>1)) 
+					a=Array.prototype.slice.call(arguments);
+				return a[Math.floor(Math.random()*a.length)];
+			}
+		</script>
+	</body>
+</html>

@@ -3,8 +3,11 @@
 	<head>
 		<style>
 			html, body {
-				border:0; margin:0; padding:0;
-				width:100%; height:100%;
+				border: 0;
+				margin: 0;
+				padding: 0;
+				width: 100%;
+				height: 100%;
 				overflow: hidden;
 				background: #000;
 			}
@@ -38,7 +41,6 @@
 				return mesh;
 			};
 			var textures = {};
-			//var tptextures = {};
 			var Pipe = function(scene, o){
 				var p = this;
 				p.pos = box.randomPoint();
@@ -49,14 +51,11 @@
 						map: textures[o.texture]
 					});
 				}else{
-					var color = '#'+Math.floor(rand(0,0xFFFFFF)).toString(16);
+					var color = ~rand(0, 0xffffff);
 					var emissive = new THREE.Color(color).multiplyScalar(0.3);
 					p.mat = new THREE.MeshPhongMaterial({
-						// light
-						specular: '#a9fcff',
-						// intermediate
+						specular: 0xa9fcff,
 						color: color,
-						// dark
 						emissive: emissive,
 						shininess: 100 
 					});
@@ -90,7 +89,6 @@
 					cylinder.overdraw = true;
 					p.o3d.add(cylinder);
 					
-					//
 					if(elbow){
 						//elbow.rotateX(Math.PI);
 						//elbow.rotation = ;
@@ -138,41 +136,6 @@
 				};
 			};
 			
-			/*var WanderingLight = function(scene){
-				var wl = this;
-				wl.v3 = box.randomPoint();
-				wl.v32 = box.randomPoint();
-				
-				var light = new THREE.SpotLight(0xffffff, 0.9);
-				//var light = new THREE.PointLight( 0xff0000, 1, 100 );
-				light.position = wl.v3;
-				
-				light.castShadow = true;
-				
-				light.shadowMapWidth = 1024;
-				light.shadowMapHeight = 1024;
-				
-				light.shadowCameraNear = 500;
-				light.shadowCameraFar = 4000;
-				light.shadowCameraFov = 30;
-				
-				scene.add(light);
-				
-				
-				wl.update = function(){
-					if(perchance(100/1000)){
-						wl.v32 = box.randomPoint();
-					}
-					var s = 0.05;
-					wl.v3.x += (wl.v3.x-wl.v32.x)*s;
-					wl.v3.y += (wl.v3.y-wl.v32.y)*s;
-					wl.v3.z += (wl.v3.z-wl.v32.z)*s;
-					
-					light.position = wl.v3;
-					light.position.multiplyScalar(0.5);
-					
-				};
-			};*/
 			
 			var pipes = [];
 			var time = 0;
@@ -197,15 +160,11 @@
 			
 			// lighting
 			var ambientLight = new THREE.AmbientLight(0x111111);
-			scene.add(ambientLight);            
+			scene.add(ambientLight);
 			
 			var directionalLightL = new THREE.DirectionalLight(0xffffff, 0.9);
 			directionalLightL.position.set(-1.2, 1.5, 0.5);
 			scene.add(directionalLightL);
-			
-			//var wanderingLight = new WanderingLight(scene);
-			//var wanderingLight2 = new WanderingLight(scene);
-			
 			
 			// this function is executed on each animation frame
 			var clearing = false;
@@ -261,21 +220,15 @@
 					}
 				}
 				
-				//wanderingLight.update();
-				//anderingLight2.update();
-				
-				// render
 				renderer.render(scene, camera);
  				
-				// request new frame
-				requestAnimationFrame(function(){
-					animate();
-				});
+				requestAnimationFrame(animate);
 			}
 			
 			function look(){
 				if(perchance(50)){
 					//head-on view
+					
 					camera.position = new THREE.Vector3(0, 0, 700);
 				}else{
 					//random view
@@ -297,8 +250,8 @@
 				renderer.setSize(window.innerWidth, window.innerHeight);
 				camera.aspect = window.innerWidth / window.innerHeight;
 				camera.updateProjectionMatrix();
-				
 			}, false);
+			
 			addEventListener('mousedown', function(e){
 				if(e.button){
 					time = 4350983;
@@ -306,6 +259,7 @@
 					look();
 				}
 			}, false);
+			
 			addEventListener('contextmenu', function(e){
 				e.preventDefault();
 				return false;
@@ -322,11 +276,6 @@
 			}
 			function perchance(percent){
 				return rand(0,100) < percent;
-			}
-			function choose(a){
-				if(!(a instanceof Array) && (typeof a!="string" || arguments.length>1)) 
-					a=Array.prototype.slice.call(arguments);
-				return a[Math.floor(Math.random()*a.length)];
 			}
 		</script>
 	</body>

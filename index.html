@@ -144,7 +144,7 @@
 				multiple: true,
 				texture: false,
 				joints: "mixed",
-				speed: 1,
+				interval: [16, 24], // range of seconds between fade-outs
 				TEAPOTS: 0
 			};
 			// renderer
@@ -167,24 +167,19 @@
 			directionalLightL.position.set(-1.2, 1.5, 0.5);
 			scene.add(directionalLightL);
 			
-			// this function is executed on each animation frame
+			
 			var clearing = false;
-			function animate(){
-				if(options.texture && !textures[options.texture]){
-					var t = THREE.ImageUtils.loadTexture(options.texture);
-					t.wrapS = t.wrapT = THREE.RepeatWrapping;
-					t.repeat.set(2,2);
-					textures[options.texture] = t;
-				}
-				// update
-				time++;
-				if(!clearing && ((chance(1/100) && time>200) || (time>5000))){
+			var clear_tid = -1;
+			function clear(fast){
+				clearTimeout(clear_tid);
+				clear_tid = setTimeout(clear, rand(options.interval[0], options.interval[1]) * 1000);
+				if(!clearing){
 					clearing = true;
-					var t = (time>504309) ? 100 : 2000;
+					var fade_out_time = fast ? 100 : 2000;
 					renderer.domElement.style.transition = 
 					renderer.domElement.style.oTransition = 
 					renderer.domElement.style.mozTtransition = 
-					renderer.domElement.style.webkitTransition = "opacity "+t+"ms ease-in-out";
+					renderer.domElement.style.webkitTransition = "opacity "+fade_out_time+"ms ease-in-out";
 					renderer.domElement.style.opacity = 0;
 					setTimeout(function(){
 						for(var i=0; i<pipes.length; i++){
@@ -199,8 +194,21 @@
 						renderer.domElement.style.mozTtransition = 
 						renderer.domElement.style.webkitTransition = "opacity 0.5s ease-in-out";
 						renderer.domElement.style.opacity = 1;
-					},t+10);
+					},fade_out_time+10);
 				}
+			}
+			clear_tid = setTimeout(clear, rand(options.interval[0], options.interval[1]) * 1000);
+			
+			// this function is executed on each animation frame
+			function animate(){
+				if(options.texture && !textures[options.texture]){
+					var t = THREE.ImageUtils.loadTexture(options.texture);
+					t.wrapS = t.wrapT = THREE.RepeatWrapping;
+					t.repeat.set(2,2);
+					textures[options.texture] = t;
+				}
+				// update
+				time++;
 				for(var i=0; i<pipes.length; i++){
 					pipes[i].update(scene);
 				}
@@ -255,7 +263,7 @@
 			
 			addEventListener('mousedown', function(e){
 				if(e.button){
-					time = 4350983;
+					clear(true);
 				}else{
 					look();
 				}

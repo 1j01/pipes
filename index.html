@@ -151,7 +151,8 @@
 			// renderer
 			var renderer = new THREE.WebGLRenderer({ clearColor: 0x000000, clearAlpha: 1, antialias: true });
 			renderer.setSize(window.innerWidth, window.innerHeight);
-			document.body.appendChild(renderer.domElement);
+			var canvas = renderer.domElement;
+			document.body.appendChild(canvas);
 			
 			// camera
 			var camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 1, 100000);
@@ -268,11 +269,18 @@
 				}else{
 					look();
 				}
+				e.preventDefault();
+				if(canvas.requestFullscreen){ // W3C API
+					canvas.requestFullscreen();
+				}else if (canvas.mozRequestFullScreen){ // Mozilla current API
+					canvas.mozRequestFullScreen();
+				}else if (canvas.webkitRequestFullScreen){ // Webkit current API
+					canvas.webkitRequestFullScreen();
+				}
 			}, false);
 			
 			addEventListener('contextmenu', function(e){
 				e.preventDefault();
-				return false;
 			}, false);
 			
 			// start animation

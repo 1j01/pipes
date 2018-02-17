@@ -218,7 +218,7 @@
 					var o = options;
 					if(chance(1/20)){
 						o = JSON.parse(JSON.stringify(options));
-						o.TEAPOTS = 1; o.texture = "candycane.png";
+						o.TEAPOTS = 1; o.texture = "images/textures/candycane.png";
 						if(!textures[o.texture]){
 							var t = THREE.ImageUtils.loadTexture(o.texture);
 							t.wrapS = t.wrapT = THREE.RepeatWrapping;

@@ -22,7 +22,9 @@ like long pipes, maybe following other pipes, and short winding pipes?
 
 * Use a disolve effect when clearing
 
-* Add icon to this README and favicon (also add a title to the page!)
+* Add icon to this README and favicon
+
+* Add screenshot(s) to this README
 
 ## See Also
 

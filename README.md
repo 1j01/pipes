@@ -4,8 +4,10 @@ A web-based remake of the Windows 3D Pipes screensaver (3D Pipes.scr) using [Thr
 
 Mouse button | Action
 --- | ---
-Primary | Change view and go full screen
+Primary | Change view
 Secondary | Clear pipes and restart
+
+Also, either button will trigger fullscreen.
 
 Includes both Utah Teapots and candy cane easter eggs! (with increased chances 😏)
 

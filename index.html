@@ -180,10 +180,7 @@
 				if(!clearing){
 					clearing = true;
 					var fade_out_time = fast ? 100 : 2000;
-					renderer.domElement.style.transition = 
-					renderer.domElement.style.oTransition = 
-					renderer.domElement.style.mozTtransition = 
-					renderer.domElement.style.webkitTransition = "opacity "+fade_out_time+"ms ease-in-out";
+					renderer.domElement.style.transition = "opacity "+fade_out_time+"ms ease-in-out";
 					renderer.domElement.style.opacity = 0;
 					setTimeout(function(){
 						for(var i=0; i<pipes.length; i++){
@@ -193,10 +190,7 @@
 						time = 0;
 						look();
 						clearing = false;
-						renderer.domElement.style.transition = 
-						renderer.domElement.style.oTransition = 
-						renderer.domElement.style.mozTtransition = 
-						renderer.domElement.style.webkitTransition = "opacity 0.5s ease-in-out";
+						renderer.domElement.style.transition = "opacity 0.5s ease-in-out";
 						renderer.domElement.style.opacity = 1;
 					},fade_out_time+10);
 				}

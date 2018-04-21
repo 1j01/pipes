@@ -1,19 +1,12 @@
-# Pipes
+# [![](images/meta/icon-32x32.png) Pipes](https://1j01.github.io/pipes/)
 
 A web-based remake of the Windows 3D Pipes screensaver (3D Pipes.scr or sspipes.scr) using [Three.js](https://threejs.org/)
 
-Includes both Utah Teapots and candy cane easter eggs! (with increased chances 😏)
+Includes both [Utah Teapots](https://en.wikipedia.org/wiki/Utah_teapot) and candy cane easter eggs! (with increased chances 😏)
 
 [Check it out!](https://1j01.github.io/pipes/)
 
 [![](images/meta/screencap.gif)](https://1j01.github.io/pipes/)
-
-Mouse button | Action
---- | ---
-Primary | Change view
-Secondary | Clear pipes and restart
-
-Also, either button will trigger fullscreen.
 
 ## TODO
 
@@ -28,15 +21,14 @@ could use [spline extrusion](https://threejs.org/examples/#webgl_geometry_extrud
 Long pipes, following other pipes, short winding pipes?
 Avoiding intersection?
 Where's the source code to the original pipes screensaver?
-If I google "original pipes screensaver source code" I get...
-[an HN post about this very project](https://news.ycombinator.com/item?id=10609822) as the top result,
-which is not helpful, altho it is flattering. 😛
+If I [google](https://www.google.com/search?q=original+pipes+screensaver+source+code) "original pipes screensaver source code" I get...
+[an HN post about this very project](https://news.ycombinator.com/item?id=10609822) as the top result 😛
 
 * Ball joint at the start of a pipe
 
 * Use a disolve effect when clearing
 
-* Add icon to this README and favicon
+* Add favicon
 
 ## See Also
 

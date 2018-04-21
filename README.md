@@ -4,6 +4,8 @@ A web-based remake of the Windows 3D Pipes screensaver (3D Pipes.scr or sspipes.
 
 Includes both Utah Teapots and candy cane easter eggs! (with increased chances 😏)
 
+[![](images/meta/screencap.gif)](https://1j01.github.io/pipes/)
+
 Mouse button | Action
 --- | ---
 Primary | Change view
@@ -33,8 +35,6 @@ which is not helpful, altho it is flattering. 😛
 * Use a disolve effect when clearing
 
 * Add icon to this README and favicon
-
-* Add screenshot(s) to this README
 
 ## See Also
 

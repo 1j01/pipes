@@ -28,8 +28,6 @@ If I [google](https://www.google.com/search?q=original+pipes+screensaver+source+
 
 * Use a disolve effect when clearing
 
-* Add favicon
-
 ## See Also
 
 * [98: a recreation of the Windows 98 desktop](https://github.com/1j01/98)

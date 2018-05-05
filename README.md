@@ -30,6 +30,10 @@ If I [google](https://www.google.com/search?q=original+pipes+screensaver+source+
 
 ## See Also
 
-* [98: a recreation of the Windows 98 desktop](https://github.com/1j01/98)
+* [98.js: a recreation of the Windows 98 desktop](https://github.com/1j01/98)
 
 * [NW Screensaver: a platform for running web pages as screensavers](https://github.com/1j01/nw-screensaver)
+
+## License
+
+MIT-licensed; see [LICENSE](LICENSE) for details

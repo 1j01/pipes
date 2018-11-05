@@ -24,8 +24,6 @@ Avoiding intersection?
 
 * Ball joint at the start of a pipe
 
-* Use a dissolve effect when clearing
-
 * Update README GIF
 
 ## See Also

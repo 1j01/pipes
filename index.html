@@ -9,7 +9,7 @@
 		<!-- Note: chrome does not display the 16px icon in its 16px space in this case -->
 		<!-- but the 16px icon isn't objectively better, so whatever -->
 		<style>
-			html, body, canvas {
+			html, body {
 				border: 0;
 				margin: 0;
 				padding: 0;
@@ -19,6 +19,14 @@
 				background: #000;
 				color: white;
 				font-family: sans-serif;
+			}
+			#canvas-container {
+				position: relative;
+			}
+			canvas {
+				position: absolute;
+				left: 0;
+				top: 0;
 			}
 			.controls {
 				padding: 10px;
@@ -30,8 +38,7 @@
 			}
 			.controls,
 			.fork-me {
-				z-index: 1; /* otherwise the canvas will swap z order when less than 1 opacity */
-				/* Disable fullscreen to test, so you change the view without hiding these elements */
+				z-index: 1;
 			}
 			.controls th {
 				text-align: left;
@@ -67,6 +74,10 @@
 				</tbody>
 			</table>
 			<p>Either button will also trigger fullscreen.</p>
+		</div>
+		<div id="canvas-container">
+			<canvas id="canvas-webgl"></canvas>
+			<canvas id="canvas-2d"></canvas>
 		</div>
 		<script>
 			var box = new THREE.Box3(
@@ -198,12 +209,18 @@
 				interval: [16, 24], // range of seconds between fade-outs
 				TEAPOTS: 0
 			};
+
+			var canvasContainer = document.getElementById("canvas-container");
+
+			// 2d canvas for dissolve effect
+			var canvas2d = document.getElementById("canvas-2d");
+			var ctx2d = canvas2d.getContext("2d");
+
 			// renderer
-			var renderer = new THREE.WebGLRenderer({ clearColor: 0x000000, clearAlpha: 1, antialias: true });
+			var canvasWebGL = document.getElementById("canvas-webgl");
+			var renderer = new THREE.WebGLRenderer({ clearColor: 0x000000, clearAlpha: 1, antialias: true, canvas: canvasWebGL });
 			renderer.setSize(window.innerWidth, window.innerHeight);
-			var canvas = renderer.domElement;
-			document.body.appendChild(canvas);
-			
+
 			// camera
 			var camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 1, 100000);
 			look();
@@ -218,7 +235,38 @@
 			var directionalLightL = new THREE.DirectionalLight(0xffffff, 0.9);
 			directionalLightL.position.set(-1.2, 1.5, 0.5);
 			scene.add(directionalLightL);
-			
+
+			// dissolve transition effect
+
+			var dissolveRects = [];
+			var dissolveRectsIndex = -1;
+			var dissolveRectsPerRow = 50;
+			var dissolveRectsPerColumn = 50;
+			var dissolveTransitionSeconds = 2;
+			var dissolveTransitionFrames = dissolveTransitionSeconds * 60;
+			var dissolveEndCallback;
+
+			function dissolve(endCallback, seconds) {
+				// TODO: determine rect sizes better and simplify
+				// silly approximation of squares of a particular size:
+				dissolveRectsPerRow = Math.ceil(window.innerWidth / 20);
+				dissolveRectsPerColumn = Math.ceil(window.innerHeight / 20);
+
+				dissolveRects = new Array(dissolveRectsPerRow * dissolveRectsPerColumn).fill(null).map(function(_null, index){
+					return {x: index % dissolveRectsPerRow, y: Math.floor(index / dissolveRectsPerRow)};
+				});
+				shuffleArrayInPlace(dissolveRects);
+				dissolveRectsIndex = 0;
+				dissolveTransitionSeconds = seconds;
+				dissolveTransitionFrames = dissolveTransitionSeconds * 60;
+				dissolveEndCallback = endCallback;
+			}
+			function finishDissolve(){
+				dissolveEndCallback();
+				dissolveRects = [];
+				dissolveRectsIndex = -1;
+				ctx2d.clearRect(0, 0, canvas2d.width, canvas2d.height);
+			}
 			
 			var clearing = false;
 			var clear_tid = -1;
@@ -227,10 +275,9 @@
 				clear_tid = setTimeout(clear, rand(options.interval[0], options.interval[1]) * 1000);
 				if(!clearing){
 					clearing = true;
-					var fade_out_time = fast ? 100 : 2000;
-					renderer.domElement.style.transition = "opacity "+fade_out_time+"ms ease-in-out";
-					renderer.domElement.style.opacity = 0;
-					setTimeout(function(){
+					var fade_out_time = fast ? 0.2 : 2;
+					dissolve(function(){
+						renderer.clear();
 						for(var i=0; i<pipes.length; i++){
 							pipes[i].clear();
 						}
@@ -238,9 +285,7 @@
 						time = 0;
 						look();
 						clearing = false;
-						renderer.domElement.style.transition = "opacity 0.5s ease-in-out";
-						renderer.domElement.style.opacity = 1;
-					},fade_out_time+10);
+					}, fade_out_time);
 				}
 			}
 			clear_tid = setTimeout(clear, rand(options.interval[0], options.interval[1]) * 1000);
@@ -276,11 +321,45 @@
 				}
 				
 				renderer.render(scene, camera);
+				
+				if(canvas2d.width !== window.innerWidth || canvas2d.height !== window.innerHeight) {
+					canvas2d.width = window.innerWidth;
+					canvas2d.height = window.innerHeight;
+					// TODO: DRY!
+					// actually: TODO: make the 2d canvas really low resolution, and stretch it with CSS, with pixelated interpolation
+					if(dissolveRectsIndex > -1){
+						for(var i=0; i<dissolveRectsIndex; i++){
+							var rect = dissolveRects[i];
+							// TODO: could precompute rect in screen space, or at least make this clearer with "xIndex"/"yIndex"
+							var rectWidth = innerWidth / dissolveRectsPerRow;
+							var rectHeight = innerHeight / dissolveRectsPerColumn;
+							ctx2d.fillStyle = "black";
+							ctx2d.fillRect(Math.floor(rect.x * rectWidth), Math.floor(rect.y * rectHeight), Math.ceil(rectWidth), Math.ceil(rectHeight));
+						}
+					}
+				}
+				if(dissolveRectsIndex > -1){
+					// TODO: calibrate based on time transition is actually taking
+					var rectsAtATime = Math.floor(dissolveRects.length / dissolveTransitionFrames);
+					for(var i=0; i<rectsAtATime && dissolveRectsIndex < dissolveRects.length; i++){
+						var rect = dissolveRects[dissolveRectsIndex];
+						// TODO: could precompute rect in screen space, or at least make this clearer with "xIndex"/"yIndex"
+						var rectWidth = innerWidth / dissolveRectsPerRow;
+						var rectHeight = innerHeight / dissolveRectsPerColumn;
+						ctx2d.fillStyle = "black";
+						ctx2d.fillRect(Math.floor(rect.x * rectWidth), Math.floor(rect.y * rectHeight), Math.ceil(rectWidth), Math.ceil(rectHeight));
+						dissolveRectsIndex += 1;
+					}
+					if(dissolveRectsIndex === dissolveRects.length){
+						finishDissolve();
+					}
+				}
  				
 				requestAnimationFrame(animate);
 			}
 			
 			function look(){
+				// TODO: never don't change the view
 				if(chance(1/2)){
 					//head-on view
 					
@@ -307,19 +386,19 @@
 				camera.updateProjectionMatrix();
 			}, false);
 			
-			canvas.addEventListener('mousedown', function(e){
+			canvasContainer.addEventListener('mousedown', function(e){
 				if(e.button){
 					clear(true);
 				}else{
 					look();
 				}
 				e.preventDefault();
-				if(canvas.requestFullscreen){ // W3C API
-					canvas.requestFullscreen();
-				}else if (canvas.mozRequestFullScreen){ // Mozilla current API
-					canvas.mozRequestFullScreen();
-				}else if (canvas.webkitRequestFullScreen){ // Webkit current API
-					canvas.webkitRequestFullScreen();
+				if(canvasContainer.requestFullscreen){ // W3C API
+					canvasContainer.requestFullscreen();
+				}else if (canvasContainer.mozRequestFullScreen){ // Mozilla current API
+					canvasContainer.mozRequestFullScreen();
+				}else if (canvasContainer.webkitRequestFullScreen){ // Webkit current API
+					canvasContainer.webkitRequestFullScreen();
 				}
 			}, false);
 			
@@ -338,6 +417,14 @@
 			}
 			function chance(value){
 				return rand(0, 1) < value;
+			}
+			function shuffleArrayInPlace(array) {
+				for (var i = array.length - 1; i > 0; i--) {
+					var j = Math.floor(Math.random() * (i + 1));
+					var temp = array[i];
+					array[i] = array[j];
+					array[j] = temp;
+				}
 			}
 		</script>
 	</body>

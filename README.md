@@ -12,27 +12,33 @@ Includes both [Utah Teapots](https://en.wikipedia.org/wiki/Utah_teapot) and cand
 
 * Expose options in the UI (and save to local storage)
 
-* Handle different joint options (currectly only does "mixed", which is the best option anyways)
+* Handle different joint options (currently only does "mixed" (which is the best option anyways, except I haven't implemented proper elbow joints))
 
-* Better elbow joints (currently uses a sphere (smaller than the ball joint so it doesn't stick out) rather than a section of a torus);
+* Proper elbow joints (currently uses a sphere (smaller than the ball joint so it doesn't stick out) rather than a section of a torus);
 could use [spline extrusion](https://threejs.org/examples/#webgl_geometry_extrude_splines) rather than trying to align a torus section every which way
 
 * Investigate pipe behaviors.
 Long pipes, following other pipes, short winding pipes?
 Avoiding intersection?
-Where's the source code to the original pipes screensaver?
-If I [google](https://www.google.com/search?q=original+pipes+screensaver+source+code) "original pipes screensaver source code" I get...
-[an HN post about this very project](https://news.ycombinator.com/item?id=10609822) as the top result 😛
+...After quite some searching, I finally found the [original OpenGL pipes screensaver source code here](https://winworldpc.com/download/3d03c2ad-c2ad-18c3-9a11-c3a4e284a2ef) (in `K:\MSTOOLS\SAMPLES\OPENGL\SCRSAVE`).
 
 * Ball joint at the start of a pipe
 
-* Use a disolve effect when clearing
+* Use a dissolve effect when clearing
+
+* Update README GIF
 
 ## See Also
+
+##### Mine / Affiliated
 
 * [98.js: a recreation of the Windows 98 desktop](https://github.com/1j01/98)
 
 * [NW Screensaver: a platform for running web pages as screensavers](https://github.com/1j01/nw-screensaver)
+
+##### Unaffiliated
+
+* [Screensaver Subterfuge: a game set in the 3D maze screensaver](https://poor-track-design.itch.io/screensaver-subterfuge)
 
 ## License
 

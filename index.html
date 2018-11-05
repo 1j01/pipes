@@ -106,13 +106,6 @@
 				new THREE.Vector3(-500,-500,-500),
 				new THREE.Vector3(500,500,500)
 			);
-			box.randomPoint = function(){
-				return new THREE.Vector3(
-					rand(this.min.x, this.max.x),
-					rand(this.min.y, this.max.y),
-					rand(this.min.z, this.max.z)
-				);
-			};
 			var cylinderBetweenPoints = function(point1, point2, material){
 				var direction = new THREE.Vector3().subVectors(point2, point1);
 				var arrow = new THREE.ArrowHelper(direction.clone().normalize(), point1);
@@ -128,7 +121,7 @@
 			var textures = {};
 			var Pipe = function(scene, o){
 				var p = this;
-				p.pos = box.randomPoint();
+				p.pos = randomPointInBox(box);
 				p.o3d = new THREE.Object3D();
 				scene.add(p.o3d);
 				if(o.texture){
@@ -452,6 +445,13 @@
 					array[j] = temp;
 				}
 			}
+			function randomPointInBox(box){
+				return new THREE.Vector3(
+					rand(box.min.x, box.max.x),
+					rand(box.min.y, box.max.y),
+					rand(box.min.z, box.max.z)
+				);
+			};
 		</script>
 	</body>
 </html>

@@ -136,7 +136,7 @@
 						specular: 0xa9fcff,
 						color: color,
 						emissive: emissive,
-						shininess: 100 
+						shininess: 100,
 					});
 				}
 				// var elbow;
@@ -207,18 +207,38 @@
 						p.o3d.add(elball);
 
 						// extrude an elbow joint
-						// var extrudePath = new THREE.Path();
-						// extrudePath.moveTo( 0, 0.8 );
-						// extrudePath.quadraticCurveTo( 0, 1, 0.2, 1 );
-						// extrudePath.lineTo( 1, 1 );
+						/*
+						function ArcCurve( scale ) {
+							THREE.Curve.call( this );
+							this.scale = ( scale === undefined ) ? 1 : scale;
+						}
 
-						// var extrusionSegments = 100;
-						// var radiusSegments = 10;
-						// var tubeGeometry = new THREE.TubeBufferGeometry( extrudePath, extrusionSegments, 2, radiusSegments, false );
+						ArcCurve.prototype = Object.create( THREE.Curve.prototype );
+						ArcCurve.prototype.constructor = ArcCurve;
+
+						ArcCurve.prototype.getPoint = function ( t ) {
+							function circ(t) {
+								return Math.sqrt(1 - t*t);
+							}
+
+							var tx = t;
+							var ty = circ(t);
+							var tz = 0;
+
+							return new THREE.Vector3( tx, ty, tz ).multiplyScalar( this.scale );
+						};
+
+						var extrudePath = new ArcCurve( 10 );
+
+						var extrusionSegments = 100;
+						var radiusSegments = 10;
+						var radius = 10;
+						var tubeGeometry = new THREE.TubeBufferGeometry( extrudePath, extrusionSegments, radius, radiusSegments, false );
 						
-						// var elbow = new THREE.Mesh(tubeGeometry, p.mat);
-						// elbow.position.copy(p.pos);
-						// p.o3d.add(elbow);
+						var elbow = new THREE.Mesh(tubeGeometry, p.mat);
+						elbow.position.copy(p.pos);
+						p.o3d.add(elbow);
+						*/
 					}
 					
 					//finish

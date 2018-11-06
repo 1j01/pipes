@@ -400,7 +400,9 @@
 					}
 				}
 				
-				renderer.render(scene, camera);
+				if(!clearing){
+					renderer.render(scene, camera);
+				}
 				
 				if(canvas2d.width !== window.innerWidth || canvas2d.height !== window.innerHeight) {
 					canvas2d.width = window.innerWidth;

@@ -22,8 +22,6 @@ Long pipes, following other pipes, short winding pipes?
 Avoiding intersection?
 ...After quite some searching, I finally found the [original OpenGL pipes screensaver source code here](https://winworldpc.com/download/3d03c2ad-c2ad-18c3-9a11-c3a4e284a2ef) (in `K:\MSTOOLS\SAMPLES\OPENGL\SCRSAVE`).
 
-* Ball joint at the start of a pipe
-
 * Update README GIF
 
 * VR maybe

@@ -139,6 +139,11 @@
 						shininess: 100,
 					});
 				}
+				// TODO: DRY
+				var ball = new THREE.Mesh(new THREE.SphereGeometry(15, 8, 8), p.mat);
+				ball.position.copy(p.pos);
+				p.o3d.add(ball);
+
 				// var elbow;
 				
 				p.update = function(){

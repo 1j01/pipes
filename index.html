@@ -65,8 +65,9 @@
 				fill: currentColor;
 			}
 		</style>
-		<script src="lib/3.js"></script>
-		<script src="lib/TeapotGeometry.js"></script>
+		<script src="lib/sri-fallback.js"></script>
+		<script x-sri-fallback="lib/three.min.js" src="https://cdnjs.cloudflare.com/ajax/libs/three.js/98/three.min.js" integrity="sha256-MbIcpOhIEGLabqntH1B7ZgE7a6V0TrocmKouz1npT1g=" crossorigin="anonymous"></script>
+		<script src="lib/TeapotBufferGeometry.js"></script>
 		<meta name="viewport" content="width=device-width, user-scalable=no">
 	</head>
 	<body>
@@ -114,7 +115,7 @@
 				var mesh = new THREE.Mesh(geom, material);
 				
 				mesh.rotation.setFromQuaternion(arrow.quaternion);
-				mesh.position = new THREE.Vector3().addVectors(point1, direction.multiplyScalar(0.5));
+				mesh.position.addVectors(point1, direction.multiplyScalar(0.5));
 				mesh.updateMatrix();
 				return mesh;
 			};
@@ -138,7 +139,8 @@
 						shininess: 100 
 					});
 				}
-				var elbow;
+				// var elbow;
+				
 				p.update = function(){
 					var dist = Math.floor(rand(1,5))*50;
 					var newpos = p.pos.clone();
@@ -167,23 +169,23 @@
 					cylinder.overdraw = true;
 					p.o3d.add(cylinder);
 					
-					if(elbow){
-						//elbow.rotateX(Math.PI);
-						//elbow.rotation = ;
-						p.o3d.add(elbow);
-					}
+					// if(elbow){
+					// 	//elbow.rotateX(Math.PI);
+					// 	//elbow.rotation.set(...)
+					// 	p.o3d.add(elbow);
+					// }
 					
 					//joint
 					if(chance(1/200 + options.TEAPOTS/20)){
-						//THREE.TeapotGeometry=function(size,segments,bottom,lid,body,fitLid,blinn);
 						//var tptex = textures[o.texture].clone();
 						//tptex.repeat.set(1,1);
+						// THREE.TeapotBufferGeometry = function ( size, segments, bottom, lid, body, fitLid, blinn )
 						var teapot = new THREE.Mesh(
-							new THREE.TeapotGeometry(15, true, true, true, true, true), 
+							new THREE.TeapotBufferGeometry(15, true, true, true, true, true), 
 							p.mat
 							//new THREE.MeshLambertMaterial({map: tptex})
 						);
-						teapot.position = p.pos.clone();
+						teapot.position.copy(p.pos);
 						teapot.rotation.x = Math.floor(rand(0,50))*Math.PI/2;
 						teapot.rotation.y = Math.floor(rand(0,50))*Math.PI/2;
 						teapot.rotation.z = Math.floor(rand(0,50))*Math.PI/2;
@@ -191,18 +193,32 @@
 					}else if(chance(1/20)){
 						//ball
 						var ball = new THREE.Mesh(new THREE.SphereGeometry(15, 8, 8), p.mat);
-						ball.position = p.pos.clone();
+						ball.position.copy(p.pos);
 						p.o3d.add(ball);
 					}else{
 						//elbow
 						//var r = 20;
 						//elbow = new THREE.Mesh(new THREE.TorusGeometry(r, 10, 8, 8, Math.PI/2), p.mat);
-						//elbow.position = p.pos.clone();
+						//elbow.position.copy(p.pos);
 						
-						//elball
+						//elball (not a proper elbow)
 						var elball = new THREE.Mesh(new THREE.SphereGeometry(10, 8, 8), p.mat);
-						elball.position = p.pos.clone();
+						elball.position.copy(p.pos);
 						p.o3d.add(elball);
+
+						// extrude an elbow joint
+						// var extrudePath = new THREE.Path();
+						// extrudePath.moveTo( 0, 0.8 );
+						// extrudePath.quadraticCurveTo( 0, 1, 0.2, 1 );
+						// extrudePath.lineTo( 1, 1 );
+
+						// var extrusionSegments = 100;
+						// var radiusSegments = 10;
+						// var tubeGeometry = new THREE.TubeBufferGeometry( extrudePath, extrusionSegments, 2, radiusSegments, false );
+						
+						// var elbow = new THREE.Mesh(tubeGeometry, p.mat);
+						// elbow.position.copy(p.pos);
+						// p.o3d.add(elbow);
 					}
 					
 					//finish
@@ -233,7 +249,7 @@
 
 			// renderer
 			var canvasWebGL = document.getElementById("canvas-webgl");
-			var renderer = new THREE.WebGLRenderer({ clearColor: 0x000000, clearAlpha: 1, antialias: true, canvas: canvasWebGL });
+			var renderer = new THREE.WebGLRenderer({ alpha: true, antialias: true, canvas: canvasWebGL });
 			renderer.setSize(window.innerWidth, window.innerHeight);
 
 			// camera
@@ -378,7 +394,7 @@
 				if(chance(1/2)){
 					//head-on view
 					
-					camera.position = new THREE.Vector3(0, 0, 700);
+					camera.position.set(0, 0, 700);
 				}else{
 					//random view
 					
@@ -389,7 +405,7 @@
 					var matrix = new THREE.Matrix4().makeRotationAxis(axis, angle);
 					
 					vector.applyMatrix4( matrix );
-					camera.position = vector;
+					camera.position.copy(vector);
 				}
 				var center = new THREE.Vector3(0,0,0);
 				camera.lookAt(center);

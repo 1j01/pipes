@@ -1,0 +1,35 @@
+{
+  "name": "3d-pipes",
+  "version": "0.1.0",
+  "description": "Recreation of the 3D Pipes screensaver from Windows 95 & 98",
+  "main": "index.html",
+  "scripts": {
+    "test": "index.html"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/1j01/pipes.git"
+  },
+  "keywords": [
+    "pipes",
+    "pipe",
+    "3d",
+    "screensaver",
+    "webgl",
+    "threejs",
+    "three.js",
+    "recreation",
+    "remake",
+    "clone",
+    "scene",
+    "windows",
+    "classic",
+    "retro"
+  ],
+  "author": "Isaiah Odhner <isaiahodhner@gmail.com>",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/1j01/pipes/issues"
+  },
+  "homepage": "https://github.com/1j01/pipes#readme"
+}

@@ -176,20 +176,23 @@
 					teapot.rotation.z = Math.floor(rand(0,50))*Math.PI/2;
 					p.o3d.add(teapot);
 				};
-				var makeElbowJoint = function(newpos, lastpos, tangent){
-					// var tangent = new THREE.Vector3().subVectors(lastpos, beforelastpos).normalize();
+				var makeElbowJoint = function(fromPosition, toPosition, tangentVector){
 
 					//elbow
-					//var r = 20;
-					//elbow = new THREE.Mesh(new THREE.TorusGeometry(r, 10, 8, 8, Math.PI/2), p.mat);
-					//elbow.position.copy(p.pos);
+					// var r = 0.2;
+					// elbow = new THREE.Mesh(new THREE.TorusGeometry(r, pipeRadius, 8, 8, Math.PI/2), p.mat);
+					// elbow.position.copy(fromPosition);
+					// p.o3d.add(elbow);
 					
 					//elball (not a proper elbow)
 					var elball = new THREE.Mesh(new THREE.SphereGeometry(pipeRadius, 8, 8), p.mat);
-					elball.position.copy(p.pos);
+					elball.position.copy(fromPosition);
 					p.o3d.add(elball);
 
 					// extrude an elbow joint
+					
+					// there's THREE.EllipseCurve... but that's 2D
+
 					// function ArcCurve( scale ) {
 					// 	THREE.Curve.call( this );
 					// 	this.scale = ( scale === undefined ) ? 1 : scale; // TODO: remove me probably
@@ -210,9 +213,9 @@
 					// 	return new THREE.Vector3( tx, ty, tz ).multiplyScalar( this.scale );
 					// };
 
-					// var extrudePath = new ArcCurve( 10 );
+					// var extrudePath = new ArcCurve( 0.1 );
 
-					// var extrudePath = new THREE.CatmullRomCurve3([p.pos, newpos], false, new THREE.Vector3(Math.random(), Math.random(), Math.random()));
+					// var extrudePath = new THREE.CatmullRomCurve3([fromPosition, toPosition], false); // not enough to define the curve
 
 					// var extrusionSegments = 100;
 					// var radiusSegments = 10;
@@ -220,7 +223,7 @@
 					// var tubeGeometry = new THREE.TubeBufferGeometry( extrudePath, extrusionSegments, radius, radiusSegments, false );
 					
 					// var elbow = new THREE.Mesh(tubeGeometry, p.mat);
-					// elbow.position.copy(p.pos);
+					// elbow.position.copy(toPosition);
 					// p.o3d.add(elbow);
 				};
 
@@ -234,10 +237,10 @@
 				p.update = function(){
 					if(p.positions.length > 1){
 						var lastpos = p.positions[p.positions.length - 2];
-						var previousDirectionVector = new THREE.Vector3().subVectors(p.pos, lastpos);
+						var lastDirectionVector = new THREE.Vector3().subVectors(p.pos, lastpos);
 					}
-					if(chance(1/2) && previousDirectionVector){
-						var directionVector = previousDirectionVector;
+					if(chance(1/2) && lastDirectionVector){
+						var directionVector = lastDirectionVector;
 					}else{
 						// TODO: use vector logic for getting a random direction (for brevity), and share with teapot orientation logic
 						var directionVector = new THREE.Vector3();
@@ -274,13 +277,13 @@
 
 					// joint
 					// (initial ball joint is handled elsewhere)
-					if(p.positions.length > 1 && !previousDirectionVector.equals(directionVector)){
+					if(lastDirectionVector && !lastDirectionVector.equals(directionVector)){
 						if(chance(1/200 + options.TEAPOTS/20)){
 							makeTeapotJoint(p.pos);
 						}else if(chance(1/20)){
 							makeBallJoint(p.pos);
 						}else{
-							makeElbowJoint(newpos, p.pos, directionVector);
+							makeElbowJoint(p.pos, newpos, lastDirectionVector);
 						}
 					}
 					
@@ -295,8 +298,7 @@
 
 					// var extrusionSegments = 10 * p.positions.length;
 					// var radiusSegments = 10;
-					// var radius = 10;
-					// var tubeGeometry = new THREE.TubeBufferGeometry( extrudePath, extrusionSegments, radius, radiusSegments, false );
+					// var tubeGeometry = new THREE.TubeBufferGeometry( extrudePath, extrusionSegments, pipeRadius, radiusSegments, false );
 					
 					// if(p.mesh){
 					// 	p.o3d.remove(p.mesh);
@@ -379,13 +381,13 @@
 			}
 			
 			var clearing = false;
-			var clear_tid = -1;
+			var clearTID = -1;
 			function clear(fast){
-				clearTimeout(clear_tid);
-				clear_tid = setTimeout(clear, rand(options.interval[0], options.interval[1]) * 1000);
+				clearTimeout(clearTID);
+				clearTID = setTimeout(clear, rand(options.interval[0], options.interval[1]) * 1000);
 				if(!clearing){
 					clearing = true;
-					var fade_out_time = fast ? 0.2 : 2;
+					var fadeOutTime = fast ? 0.2 : 2;
 					dissolve(function(){
 						renderer.clear();
 						for(var i=0; i<pipes.length; i++){
@@ -396,10 +398,10 @@
 						time = 0;
 						look();
 						clearing = false;
-					}, fade_out_time);
+					}, fadeOutTime);
 				}
 			}
-			clear_tid = setTimeout(clear, rand(options.interval[0], options.interval[1]) * 1000);
+			clearTID = setTimeout(clear, rand(options.interval[0], options.interval[1]) * 1000);
 			
 			// this function is executed on each animation frame
 			function animate(){

@@ -1,4 +1,4 @@
-var box = new THREE.Box3(
+var gridBounds = new THREE.Box3(
   new THREE.Vector3(-10, -10, -10),
   new THREE.Vector3(10, 10, 10)
 );
@@ -15,206 +15,203 @@ function clearGrid() {
 
 var textures = {};
 var Pipe = function(scene, o) {
-  var p = this;
+  var self = this;
   var pipeRadius = 0.2;
   var ballJointRadius = pipeRadius * 1.5;
   var teapotSize = ballJointRadius;
 
-  p.pos = integerRandomPointInBox(box);
-  p.positions = [p.pos];
-  p.o3d = new THREE.Object3D();
-  scene.add(p.o3d);
-  if (o.texture) {
-    p.mat = new THREE.MeshLambertMaterial({
-      map: textures[o.texture],
+  self.currentPosition = integerRandomPointInBox(gridBounds);
+  self.positions = [self.currentPosition];
+  self.object3d = new THREE.Object3D();
+  scene.add(self.object3d);
+  if (o.texturePath) {
+    self.material = new THREE.MeshLambertMaterial({
+      map: textures[o.texturePath],
     });
   } else {
     var color = ~rand(0, 0xffffff);
     var emissive = new THREE.Color(color).multiplyScalar(0.3);
-    p.mat = new THREE.MeshPhongMaterial({
+    self.material = new THREE.MeshPhongMaterial({
       specular: 0xa9fcff,
       color: color,
       emissive: emissive,
       shininess: 100,
     });
   }
-  var makeCylinderBetweenPoints = function(point1, point2, material) {
-    var direction = new THREE.Vector3().subVectors(point2, point1);
-    var arrow = new THREE.ArrowHelper(direction.clone().normalize(), point1);
-
-    var geom = new THREE.CylinderGeometry(
+  var makeCylinderBetweenPoints = function(fromPoint, toPoint, material) {
+    var deltaVector = new THREE.Vector3().subVectors(toPoint, fromPoint);
+    var arrow = new THREE.ArrowHelper(
+      deltaVector.clone().normalize(),
+      fromPoint
+    );
+    var geometry = new THREE.CylinderGeometry(
       pipeRadius,
       pipeRadius,
-      direction.length(),
+      deltaVector.length(),
       10,
       4,
       true
     );
-    var mesh = new THREE.Mesh(geom, material);
+    var mesh = new THREE.Mesh(geometry, material);
 
     mesh.rotation.setFromQuaternion(arrow.quaternion);
-    mesh.position.addVectors(point1, direction.multiplyScalar(0.5));
+    mesh.position.addVectors(fromPoint, deltaVector.multiplyScalar(0.5));
     mesh.updateMatrix();
 
-    p.o3d.add(mesh);
+    self.object3d.add(mesh);
   };
   var makeBallJoint = function(position) {
     var ball = new THREE.Mesh(
       new THREE.SphereGeometry(ballJointRadius, 8, 8),
-      p.mat
+      self.material
     );
     ball.position.copy(position);
-    p.o3d.add(ball);
+    self.object3d.add(ball);
   };
   var makeTeapotJoint = function(position) {
-    //var tptex = textures[o.texture].clone();
-    //tptex.repeat.set(1,1);
+    //var teapotTexture = textures[o.texturePath].clone();
+    //teapotTexture.repeat.set(1, 1);
     // THREE.TeapotBufferGeometry = function ( size, segments, bottom, lid, body, fitLid, blinn )
     var teapot = new THREE.Mesh(
       new THREE.TeapotBufferGeometry(teapotSize, true, true, true, true, true),
-      p.mat
-      //new THREE.MeshLambertMaterial({map: tptex})
+      self.material
+      //new THREE.MeshLambertMaterial({ map: teapotTexture })
     );
     teapot.position.copy(position);
     teapot.rotation.x = (Math.floor(rand(0, 50)) * Math.PI) / 2;
     teapot.rotation.y = (Math.floor(rand(0, 50)) * Math.PI) / 2;
     teapot.rotation.z = (Math.floor(rand(0, 50)) * Math.PI) / 2;
-    p.o3d.add(teapot);
+    self.object3d.add(teapot);
   };
   var makeElbowJoint = function(fromPosition, toPosition, tangentVector) {
-    //elbow
+    // elbow
     // var r = 0.2;
-    // elbow = new THREE.Mesh(new THREE.TorusGeometry(r, pipeRadius, 8, 8, Math.PI/2), p.mat);
+    // elbow = new THREE.Mesh(
+    //   new THREE.TorusGeometry(r, pipeRadius, 8, 8, Math.PI / 2),
+    //   self.material
+    // );
     // elbow.position.copy(fromPosition);
-    // p.o3d.add(elbow);
+    // self.object3d.add(elbow);
 
-    //elball (not a proper elbow)
+    // "elball" (not a proper elbow)
     var elball = new THREE.Mesh(
       new THREE.SphereGeometry(pipeRadius, 8, 8),
-      p.mat
+      self.material
     );
     elball.position.copy(fromPosition);
-    p.o3d.add(elball);
+    self.object3d.add(elball);
 
     // extrude an elbow joint
 
     // there's THREE.EllipseCurve... but that's 2D
 
-    // function ArcCurve( scale ) {
-    // 	THREE.Curve.call( this );
-    // 	this.scale = ( scale === undefined ) ? 1 : scale; // TODO: remove me probably
+    // function ArcCurve(scale) {
+    //   THREE.Curve.call(this);
+    //   this.scale = scale === undefined ? 1 : scale; // TODO: remove me probably
     // }
 
-    // ArcCurve.prototype = Object.create( THREE.Curve.prototype );
+    // ArcCurve.prototype = Object.create(THREE.Curve.prototype);
     // ArcCurve.prototype.constructor = ArcCurve;
 
-    // ArcCurve.prototype.getPoint = function ( t ) {
-    // 	function circ(t) {
-    // 		return Math.sqrt(1 - t*t);
-    // 	}
+    // ArcCurve.prototype.getPoint = function(t) {
+    //   function circ(t) {
+    //     return Math.sqrt(1 - t * t);
+    //   }
 
-    // 	var tx = t;
-    // 	var ty = circ(t);
-    // 	var tz = 0;
+    //   var tx = t;
+    //   var ty = circ(t);
+    //   var tz = 0;
 
-    // 	return new THREE.Vector3( tx, ty, tz ).multiplyScalar( this.scale );
+    //   return new THREE.Vector3(tx, ty, tz).multiplyScalar(this.scale);
     // };
 
-    // var extrudePath = new ArcCurve( 0.1 );
+    // var extrudePath = new ArcCurve(0.1);
 
     // var extrudePath = new THREE.CatmullRomCurve3([fromPosition, toPosition], false); // not enough to define the curve
 
     // var extrusionSegments = 100;
     // var radiusSegments = 10;
     // var radius = pipeRadius;
-    // var tubeGeometry = new THREE.TubeBufferGeometry( extrudePath, extrusionSegments, radius, radiusSegments, false );
+    // var tubeGeometry = new THREE.TubeBufferGeometry(
+    //   extrudePath,
+    //   extrusionSegments,
+    //   radius,
+    //   radiusSegments,
+    //   false
+    // );
 
-    // var elbow = new THREE.Mesh(tubeGeometry, p.mat);
+    // var elbow = new THREE.Mesh(tubeGeometry, self.material);
     // elbow.position.copy(toPosition);
-    // p.o3d.add(elbow);
+    // self.object3d.add(elbow);
   };
 
-  // if(getAt(p.pos)){
-  // 	return; // TODO: find a position that's free
+  // if (getAt(self.currentPosition)) {
+  //   return; // TODO: find a position that's free
   // }
-  setAt(p.pos, p);
+  setAt(self.currentPosition, self);
 
-  makeBallJoint(p.pos);
+  makeBallJoint(self.currentPosition);
 
-  p.update = function() {
-    if (p.positions.length > 1) {
-      var lastpos = p.positions[p.positions.length - 2];
-      var lastDirectionVector = new THREE.Vector3().subVectors(p.pos, lastpos);
+  self.update = function() {
+    if (self.positions.length > 1) {
+      var lastPosition = self.positions[self.positions.length - 2];
+      var lastDirectionVector = new THREE.Vector3().subVectors(
+        self.currentPosition,
+        lastPosition
+      );
     }
     if (chance(1 / 2) && lastDirectionVector) {
       var directionVector = lastDirectionVector;
     } else {
-      // TODO: use vector logic for getting a random direction (for brevity), and share with teapot orientation logic
       var directionVector = new THREE.Vector3();
-      if (chance(1 / 2)) {
-        if (chance(1 / 3)) {
-          directionVector.x += 1;
-        } else if (chance(1 / 2)) {
-          directionVector.y += 1;
-        } else {
-          directionVector.z += 1;
-        }
-      } else {
-        if (chance(1 / 3)) {
-          directionVector.x -= 1;
-        } else if (chance(1 / 2)) {
-          directionVector.y -= 1;
-        } else {
-          directionVector.z -= 1;
-        }
-      }
+      directionVector[chooseFrom("xyz")] += chooseFrom([+1, -1]);
     }
-    var newpos = new THREE.Vector3().addVectors(p.pos, directionVector);
+    var newPosition = new THREE.Vector3().addVectors(
+      self.currentPosition,
+      directionVector
+    );
 
     // TODO: try other possibilities
     // ideally, have a pool of the 6 possible directions and try them in random order, removing them from the bag
     // (and if there's truly nowhere to go, maybe make a ball joint)
-    if (!box.containsPoint(newpos)) {
+    if (!gridBounds.containsPoint(newPosition)) {
       return;
     }
-    if (getAt(newpos)) {
+    if (getAt(newPosition)) {
       return;
     }
-    setAt(newpos, p);
+    setAt(newPosition, self);
 
     // joint
     // (initial ball joint is handled elsewhere)
     if (lastDirectionVector && !lastDirectionVector.equals(directionVector)) {
-      if (chance(1 / 200 + options.TEAPOTS / 20)) {
-        makeTeapotJoint(p.pos);
+      if (chance(1 / 200 + options.MOAR_TEAPOTS / 20)) {
+        makeTeapotJoint(self.currentPosition);
       } else if (chance(1 / 20)) {
-        makeBallJoint(p.pos);
+        makeBallJoint(self.currentPosition);
       } else {
-        makeElbowJoint(p.pos, newpos, lastDirectionVector);
+        makeElbowJoint(self.currentPosition, newPosition, lastDirectionVector);
       }
     }
 
     // pipe
-    makeCylinderBetweenPoints(p.pos, newpos, p.mat);
+    makeCylinderBetweenPoints(self.currentPosition, newPosition, self.material);
 
     // update
-    p.pos = newpos;
-    p.positions.push(newpos);
+    self.currentPosition = newPosition;
+    self.positions.push(newPosition);
 
-    // var extrudePath = new THREE.CatmullRomCurve3(p.positions, false, "catmullrom");
+    // var extrudePath = new THREE.CatmullRomCurve3(self.positions, false, "catmullrom");
 
-    // var extrusionSegments = 10 * p.positions.length;
+    // var extrusionSegments = 10 * self.positions.length;
     // var radiusSegments = 10;
     // var tubeGeometry = new THREE.TubeBufferGeometry( extrudePath, extrusionSegments, pipeRadius, radiusSegments, false );
 
-    // if(p.mesh){
-    // 	p.o3d.remove(p.mesh);
+    // if(self.mesh){
+    // 	self.object3d.remove(self.mesh);
     // }
-    // p.mesh = new THREE.Mesh(tubeGeometry, p.mat);
-    // p.o3d.add(p.mesh);
-  };
-  p.clear = function() {
-    scene.remove(p.o3d);
+    // self.mesh = new THREE.Mesh(tubeGeometry, self.material);
+    // self.object3d.add(self.mesh);
   };
 };
 
@@ -222,10 +219,10 @@ var pipes = [];
 var time = 0;
 var options = {
   multiple: true,
-  texture: false,
+  texturePath: false,
   joints: "mixed",
   interval: [16, 24], // range of seconds between fade-outs
-  TEAPOTS: 0,
+  MOAR_TEAPOTS: 0,
 };
 
 var canvasContainer = document.getElementById("canvas-container");
@@ -277,7 +274,7 @@ var dissolveTransitionSeconds = 2;
 var dissolveTransitionFrames = dissolveTransitionSeconds * 60;
 var dissolveEndCallback;
 
-function dissolve(endCallback, seconds) {
+function dissolve(seconds, endCallback) {
   // TODO: determine rect sizes better and simplify
   // (silly approximation of squares of a particular size:)
   dissolveRectsPerRow = Math.ceil(window.innerWidth / 20);
@@ -315,17 +312,7 @@ function clear(fast) {
   if (!clearing) {
     clearing = true;
     var fadeOutTime = fast ? 0.2 : 2;
-    dissolve(function() {
-      renderer.clear();
-      for (var i = 0; i < pipes.length; i++) {
-        pipes[i].clear();
-      }
-      pipes = [];
-      clearGrid();
-      time = 0;
-      look();
-      clearing = false;
-    }, fadeOutTime);
+    dissolve(fadeOutTime, reset);
   }
 }
 clearTID = setTimeout(
@@ -333,14 +320,26 @@ clearTID = setTimeout(
   rand(options.interval[0], options.interval[1]) * 1000
 );
 
+function reset() {
+  renderer.clear();
+  for (var i = 0; i < pipes.length; i++) {
+    scene.remove(pipes[i].object3d);
+  }
+  pipes = [];
+  clearGrid();
+  time = 0;
+  look();
+  clearing = false;
+}
+
 // this function is executed on each animation frame
 function animate() {
   controls.update();
-  if (options.texture && !textures[options.texture]) {
-    var t = THREE.ImageUtils.loadTexture(options.texture);
-    t.wrapS = t.wrapT = THREE.RepeatWrapping;
-    t.repeat.set(2, 2);
-    textures[options.texture] = t;
+  if (options.texturePath && !textures[options.texturePath]) {
+    var texture = THREE.ImageUtils.loadTexture(options.texturePath);
+    texture.wrapS = texture.wrapT = THREE.RepeatWrapping;
+    texture.repeat.set(2, 2);
+    textures[options.texturePath] = texture;
   }
   // update
   time++;
@@ -351,13 +350,14 @@ function animate() {
     var o = options;
     if (chance(1 / 20)) {
       o = JSON.parse(JSON.stringify(options));
-      o.TEAPOTS = 1;
-      o.texture = "images/textures/candycane.png";
-      if (!textures[o.texture]) {
-        var t = THREE.ImageUtils.loadTexture(o.texture);
-        t.wrapS = t.wrapT = THREE.RepeatWrapping;
-        t.repeat.set(2, 2);
-        textures[o.texture] = t;
+      o.MOAR_TEAPOTS = 1;
+      o.texturePath = "images/textures/candycane.png";
+      // TODO: DRY
+      if (!textures[o.texturePath]) {
+        var texture = THREE.ImageUtils.loadTexture(o.texturePath);
+        texture.wrapS = texture.wrapT = THREE.RepeatWrapping;
+        texture.repeat.set(2, 2);
+        textures[o.texturePath] = texture;
       }
     }
     for (var i = 0; i < 1 + options.multiple * (1 + chance(1 / 10)); i++) {
@@ -532,6 +532,9 @@ function integerRand(x1, x2) {
 }
 function chance(value) {
   return rand(0, 1) < value;
+}
+function chooseFrom(values) {
+  return values[Math.floor(Math.random() * values.length)];
 }
 function shuffleArrayInPlace(array) {
   for (var i = array.length - 1; i > 0; i--) {

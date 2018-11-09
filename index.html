@@ -65,7 +65,7 @@
       .controls td {
         padding: 10px;
       }
-      #fullscreen-button {
+      .controls > button {
         margin: 10px;
       }
       button {
@@ -90,6 +90,7 @@
       integrity="sha256-MbIcpOhIEGLabqntH1B7ZgE7a6V0TrocmKouz1npT1g="
       crossorigin="anonymous"
     ></script>
+    <script src="lib/OrbitControls.js"></script>
     <script src="lib/TeapotBufferGeometry.js"></script>
     <meta name="viewport" content="width=device-width, user-scalable=no" />
   </head>
@@ -112,6 +113,10 @@
         </svg>
         Enter Fullscreen
       </button>
+      <button id="toggle-controls">
+        <span class="normal-controls-enabled">Control Camera</span>
+        <span hidden class="orbit-controls-enabled">Relinquish Camera</span>
+      </button>
       <table>
         <thead>
           <tr>
@@ -120,19 +125,32 @@
           </tr>
         </thead>
         <tbody>
-          <tr>
+          <tr class="normal-controls-enabled">
             <td>Primary</td>
             <td>Change view</td>
           </tr>
-          <tr>
+          <tr class="normal-controls-enabled">
             <td>Secondary</td>
             <td>Clear pipes and restart</td>
+          </tr>
+          <tr hidden class="orbit-controls-enabled">
+            <td>Primary (Drag)</td>
+            <td>Rotate view</td>
+          </tr>
+          <tr hidden class="orbit-controls-enabled">
+            <td>Secondary (Drag) (or arrow keys)</td>
+            <td>Pan around</td>
+          </tr>
+          <tr hidden class="orbit-controls-enabled">
+            <td>Middle (Drag or Wheel)</td>
+            <td>Zoom</td>
           </tr>
         </tbody>
       </table>
     </div>
     <div id="canvas-container">
-      <canvas id="canvas-webgl"></canvas> <canvas id="canvas-2d"></canvas>
+      <canvas id="canvas-webgl"></canvas>
+      <canvas id="canvas-2d" style="pointer-events: none"></canvas>
     </div>
     <script src="screensaver.js"></script>
   </body>

@@ -250,7 +250,11 @@ var camera = new THREE.PerspectiveCamera(
   1,
   100000
 );
-look();
+
+// controls
+var controls = new THREE.OrbitControls(camera, renderer.domElement);
+controls.enabled = false;
+// controls.autoRotate = true;
 
 // scene
 var scene = new THREE.Scene();
@@ -331,6 +335,7 @@ clearTID = setTimeout(
 
 // this function is executed on each animation frame
 function animate() {
+  controls.update();
   if (options.texture && !textures[options.texture]) {
     var t = THREE.ImageUtils.loadTexture(options.texture);
     t.wrapS = t.wrapT = THREE.RepeatWrapping;
@@ -439,7 +444,10 @@ function look() {
   }
   var center = new THREE.Vector3(0, 0, 0);
   camera.lookAt(center);
+  // camera.updateProjectionMatrix(); // maybe?
+  controls.update();
 }
+look();
 
 addEventListener(
   "resize",
@@ -453,12 +461,24 @@ addEventListener(
 
 canvasContainer.addEventListener("mousedown", function(e) {
   e.preventDefault();
-  if (e.button) {
-    clear(true);
-  } else {
-    look();
+  if (!controls.enabled) {
+    if (e.button) {
+      clear(true);
+    } else {
+      look();
+    }
   }
+  window.getSelection().removeAllRanges();
+  document.activeElement.blur();
 });
+
+canvasContainer.addEventListener(
+  "contextmenu",
+  function(e) {
+    e.preventDefault();
+  },
+  false
+);
 
 var fullscreenButton = document.getElementById("fullscreen-button");
 fullscreenButton.addEventListener(
@@ -478,10 +498,22 @@ fullscreenButton.addEventListener(
   false
 );
 
-addEventListener(
-  "contextmenu",
+var toggleControlButton = document.getElementById("toggle-controls");
+toggleControlButton.addEventListener(
+  "click",
   function(e) {
-    e.preventDefault();
+    controls.enabled = !controls.enabled;
+    function showElementsIf(selector, condition) {
+      Array.from(document.querySelectorAll(selector)).forEach(function(el) {
+        if (condition) {
+          el.removeAttribute("hidden");
+        } else {
+          el.setAttribute("hidden", "hidden");
+        }
+      });
+    }
+    showElementsIf(".normal-controls-enabled", !controls.enabled);
+    showElementsIf(".orbit-controls-enabled", controls.enabled);
   },
   false
 );

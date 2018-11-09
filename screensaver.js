@@ -185,7 +185,7 @@ var Pipe = function(scene, o) {
     // joint
     // (initial ball joint is handled elsewhere)
     if (lastDirectionVector && !lastDirectionVector.equals(directionVector)) {
-      if (chance(1 / 200 + options.MOAR_TEAPOTS / 20)) {
+      if (chance(1 / 200 + o.MOAR_TEAPOTS / 20)) {
         makeTeapotJoint(self.currentPosition);
       } else if (chance(1 / 20)) {
         makeBallJoint(self.currentPosition);

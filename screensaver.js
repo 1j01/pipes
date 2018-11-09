@@ -14,7 +14,7 @@ function clearGrid() {
 }
 
 var textures = {};
-var Pipe = function(scene, o) {
+var Pipe = function(scene, options) {
   var self = this;
   var pipeRadius = 0.2;
   var ballJointRadius = pipeRadius * 1.5;
@@ -24,9 +24,9 @@ var Pipe = function(scene, o) {
   self.positions = [self.currentPosition];
   self.object3d = new THREE.Object3D();
   scene.add(self.object3d);
-  if (o.texturePath) {
+  if (options.texturePath) {
     self.material = new THREE.MeshLambertMaterial({
-      map: textures[o.texturePath],
+      map: textures[options.texturePath],
     });
   } else {
     var color = ~rand(0, 0xffffff);
@@ -69,7 +69,7 @@ var Pipe = function(scene, o) {
     self.object3d.add(ball);
   };
   var makeTeapotJoint = function(position) {
-    //var teapotTexture = textures[o.texturePath].clone();
+    //var teapotTexture = textures[options.texturePath].clone();
     //teapotTexture.repeat.set(1, 1);
     // THREE.TeapotBufferGeometry = function ( size, segments, bottom, lid, body, fitLid, blinn )
     var teapot = new THREE.Mesh(
@@ -185,7 +185,7 @@ var Pipe = function(scene, o) {
     // joint
     // (initial ball joint is handled elsewhere)
     if (lastDirectionVector && !lastDirectionVector.equals(directionVector)) {
-      if (chance(1 / 200 + o.MOAR_TEAPOTS / 20)) {
+      if (chance(1 / 200 + options.MOAR_TEAPOTS / 20)) {
         makeTeapotJoint(self.currentPosition);
       } else if (chance(1 / 20)) {
         makeBallJoint(self.currentPosition);
@@ -347,21 +347,21 @@ function animate() {
     pipes[i].update(scene);
   }
   if (pipes.length === 0) {
-    var o = options;
+    var pipeOptions = options;
     if (chance(1 / 20)) {
-      o = JSON.parse(JSON.stringify(options));
-      o.MOAR_TEAPOTS = 1;
-      o.texturePath = "images/textures/candycane.png";
+      pipeOptions = JSON.parse(JSON.stringify(options));
+      pipeOptions.MOAR_TEAPOTS = 1;
+      pipeOptions.texturePath = "images/textures/candycane.png";
       // TODO: DRY
-      if (!textures[o.texturePath]) {
-        var texture = THREE.ImageUtils.loadTexture(o.texturePath);
+      if (!textures[pipeOptions.texturePath]) {
+        var texture = THREE.ImageUtils.loadTexture(pipeOptions.texturePath);
         texture.wrapS = texture.wrapT = THREE.RepeatWrapping;
         texture.repeat.set(2, 2);
-        textures[o.texturePath] = texture;
+        textures[pipeOptions.texturePath] = texture;
       }
     }
     for (var i = 0; i < 1 + options.multiple * (1 + chance(1 / 10)); i++) {
-      pipes.push(new Pipe(scene, o));
+      pipes.push(new Pipe(scene, pipeOptions));
     }
   }
 

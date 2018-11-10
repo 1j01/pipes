@@ -216,7 +216,6 @@ var Pipe = function(scene, options) {
 };
 
 var pipes = [];
-var time = 0;
 var options = {
   multiple: true,
   texturePath: false,
@@ -327,7 +326,6 @@ function reset() {
   }
   pipes = [];
   clearGrid();
-  time = 0;
   look();
   clearing = false;
 }
@@ -342,7 +340,6 @@ function animate() {
     textures[options.texturePath] = texture;
   }
   // update
-  time++;
   for (var i = 0; i < pipes.length; i++) {
     pipes[i].update(scene);
   }

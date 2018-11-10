@@ -185,9 +185,9 @@ var Pipe = function(scene, options) {
     // joint
     // (initial ball joint is handled elsewhere)
     if (lastDirectionVector && !lastDirectionVector.equals(directionVector)) {
-      if (chance(1 / 200 + options.MOAR_TEAPOTS / 20)) {
+      if (chance(options.teapotChance)) {
         makeTeapotJoint(self.currentPosition);
-      } else if (chance(1 / 20)) {
+      } else if (chance(options.ballJointChance)) {
         makeBallJoint(self.currentPosition);
       } else {
         makeElbowJoint(self.currentPosition, newPosition, lastDirectionVector);
@@ -215,14 +215,26 @@ var Pipe = function(scene, options) {
   };
 };
 
+var JOINTS_ELBOW = "elbow";
+var JOINTS_BALL = "ball";
+var JOINTS_MIXED = "mixed";
+var JOINTS_CYCLE = "cycle";
+
+var jointsCycleArray = [JOINTS_ELBOW, JOINTS_BALL, JOINTS_MIXED];
+var jointsCycleIndex = 0;
+
+var jointTypeSelect = document.getElementById("joint-types");
+
 var pipes = [];
 var options = {
   multiple: true,
-  texturePath: false,
-  joints: "mixed",
-  interval: [16, 24], // range of seconds between fade-outs
-  MOAR_TEAPOTS: 0,
+  texturePath: null,
+  joints: jointTypeSelect.value,
+  interval: [16, 24], // range of seconds between fade-outs... not necessarily anything like how the original works
 };
+jointTypeSelect.addEventListener("change", function() {
+  options.joints = jointTypeSelect.value;
+});
 
 var canvasContainer = document.getElementById("canvas-container");
 
@@ -344,10 +356,18 @@ function animate() {
     pipes[i].update(scene);
   }
   if (pipes.length === 0) {
-    var pipeOptions = options;
+    var jointType = options.joints;
+    if (options.joints === JOINTS_CYCLE) {
+      jointType = jointsCycleArray[jointsCycleIndex++];
+    }
+    var pipeOptions = {
+      teapotChance: 1 / 200, // 1 / 1000 in the original
+      ballJointChance:
+        jointType === JOINTS_BALL ? 1 : jointType === JOINTS_MIXED ? 1 / 3 : 0,
+      texturePath: options.texturePath,
+    };
     if (chance(1 / 20)) {
-      pipeOptions = JSON.parse(JSON.stringify(options));
-      pipeOptions.MOAR_TEAPOTS = 1;
+      pipeOptions.teapotChance = 1 / 20; // why not? :)
       pipeOptions.texturePath = "images/textures/candycane.png";
       // TODO: DRY
       if (!textures[pipeOptions.texturePath]) {
@@ -357,6 +377,7 @@ function animate() {
         textures[pipeOptions.texturePath] = texture;
       }
     }
+    // TODO: create new pipes over time?
     for (var i = 0; i < 1 + options.multiple * (1 + chance(1 / 10)); i++) {
       pipes.push(new Pipe(scene, pipeOptions));
     }

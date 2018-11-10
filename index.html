@@ -65,7 +65,8 @@
       .controls td {
         padding: 10px;
       }
-      .controls > button {
+      .controls > button,
+      .controls > label {
         margin: 10px;
       }
       button {
@@ -113,6 +114,15 @@
         </svg>
         Enter Fullscreen
       </button>
+      <label>
+        Joint Type:
+        <select id="joint-types">
+          <option value="elbow">Elbow</option>
+          <option value="ball">Ball</option>
+          <option value="mixed" selected>Mixed</option>
+          <option value="cycle">Cycle</option>
+        </select>
+      </label>
       <button id="toggle-controls">
         <span class="normal-controls-enabled">Control Camera</span>
         <span hidden class="orbit-controls-enabled">Relinquish Camera</span>

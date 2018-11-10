@@ -10,9 +10,10 @@ Includes both [Utah Teapots](https://en.wikipedia.org/wiki/Utah_teapot) and cand
 
 ## TODO
 
-- Expose options in the UI (and save to local storage)
+- Save options to local storage, or maybe in the URL
 
-- Handle different joint options (currently only does "mixed" (which is the best option anyways, except I haven't implemented proper elbow joints))
+- Custom textures with drag and drop (and also a file input)
+  (maybe multiple textures, for it to choose from randomly)
 
 - Proper elbow joints (currently uses a sphere (smaller than the ball joint so it doesn't stick out) rather than a section of a torus);
   could use [spline extrusion](https://threejs.org/examples/#webgl_geometry_extrude_splines) rather than trying to align a torus section every which way

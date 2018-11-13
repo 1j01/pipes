@@ -8,24 +8,39 @@ Includes both [Utah Teapots](https://en.wikipedia.org/wiki/Utah_teapot) and cand
 
 [![](images/meta/screencap.gif)](https://1j01.github.io/pipes/)
 
+(This screen capture GIF is outdated. It now operates on a global grid, and avoids collisions.)
+
 ## TODO
+
+- Add back smooth fade out as an option, now that a dissolve effect is implemented
+
+- Add control for speed
+
+- Animate sections into existence, emulating CPU graphics where the triangles were drawn progressively and the screen updated in between "frames" (optionally)
+
+- Improve lighting (the original was less shiny), or at least avoid unflattering camera angles
+
+- Use a palette (what palette? please help with this)
+
+- Extra camera functions like continuous rotation, maybe even following the pipes like a rollercoaster
+
+- Allow moving camera during dissolve transition (it's kinda unpleasant how it stops you (abruptly), and the effect is implemented as an overlay anyways)
 
 - Save options to local storage, or maybe in the URL
 
 - Custom textures with drag and drop (and also a file input)
-  (maybe multiple textures, for it to choose from randomly)
+  (can accept multiple textures, for it to choose from randomly (pulling from a bag and not replacing them))
 
 - Proper elbow joints (currently uses a sphere (smaller than the ball joint so it doesn't stick out) rather than a section of a torus);
-  could use [spline extrusion](https://threejs.org/examples/#webgl_geometry_extrude_splines) rather than trying to align a torus section every which way
+  could use [spline extrusion](https://threejs.org/examples/#webgl_geometry_extrude_splines) rather than trying to align a torus section every which way (if it actually helps)
 
-- Investigate pipe behaviors.
-  Long pipes, following other pipes, short winding pipes?
-  Avoiding intersection?
-  ...After quite some searching, I finally found the [original OpenGL pipes screensaver source code here](https://winworldpc.com/download/3d03c2ad-c2ad-18c3-9a11-c3a4e284a2ef) (in `K:\MSTOOLS\SAMPLES\OPENGL\SCRSAVE`).
+- Implement different behavioral characteristics between pipes
+
+- Follow-the-leader mode
 
 - Update README GIF
 
-- VR maybe
+- An API maybe?
 
 ## See Also
 
@@ -42,3 +57,30 @@ Includes both [Utah Teapots](https://en.wikipedia.org/wiki/Utah_teapot) and cand
 ## License
 
 MIT-licensed; see [LICENSE](LICENSE) for details
+
+## Development
+
+### Live Server
+
+You just need an HTTP server, but [Live Server](https://www.npmjs.com/package/live-server) is a great option, automatically reloading when you make changes.
+
+### Prettier
+
+[Prettier](https://prettier.io/) is used for code formatting.
+
+To set up, including a pre-commit hook:
+
+- Install [Node.js](https://nodejs.org/) if you don't already have it
+- Run `npm i` in the project directory
+
+A pre-commit hook can be surprising tho; formatting on save might be better...
+
+### Reference Material
+
+The source code for the original OpenGL screensavers can be found in [a version of the Windows SDK (for Windows NT 4.0)](https://winworldpc.com/download/3d03c2ad-c2ad-18c3-9a11-c3a4e284a2ef), in `MSTOOLS\SAMPLES\OPENGL\SCRSAVE`
+
+(If you have a later version of the code, please let me know.)
+
+### Project Structure
+
+All the good stuff is in `screensaver.js`

@@ -20,7 +20,7 @@ var Pipe = function(scene, options) {
   var ballJointRadius = pipeRadius * 1.5;
   var teapotSize = ballJointRadius;
 
-  self.currentPosition = integerRandomPointInBox(gridBounds);
+  self.currentPosition = randomIntegerVector3WithinBox(gridBounds);
   self.positions = [self.currentPosition];
   self.object3d = new THREE.Object3D();
   scene.add(self.object3d);
@@ -29,7 +29,7 @@ var Pipe = function(scene, options) {
       map: textures[options.texturePath],
     });
   } else {
-    var color = ~rand(0, 0xffffff);
+    var color = randomInteger(0, 0xffffff);
     var emissive = new THREE.Color(color).multiplyScalar(0.3);
     self.material = new THREE.MeshPhongMaterial({
       specular: 0xa9fcff,
@@ -71,6 +71,7 @@ var Pipe = function(scene, options) {
   var makeTeapotJoint = function(position) {
     //var teapotTexture = textures[options.texturePath].clone();
     //teapotTexture.repeat.set(1, 1);
+
     // THREE.TeapotBufferGeometry = function ( size, segments, bottom, lid, body, fitLid, blinn )
     var teapot = new THREE.Mesh(
       new THREE.TeapotBufferGeometry(teapotSize, true, true, true, true, true),
@@ -78,9 +79,9 @@ var Pipe = function(scene, options) {
       //new THREE.MeshLambertMaterial({ map: teapotTexture })
     );
     teapot.position.copy(position);
-    teapot.rotation.x = (Math.floor(rand(0, 50)) * Math.PI) / 2;
-    teapot.rotation.y = (Math.floor(rand(0, 50)) * Math.PI) / 2;
-    teapot.rotation.z = (Math.floor(rand(0, 50)) * Math.PI) / 2;
+    teapot.rotation.x = (Math.floor(random(0, 50)) * Math.PI) / 2;
+    teapot.rotation.y = (Math.floor(random(0, 50)) * Math.PI) / 2;
+    teapot.rotation.z = (Math.floor(random(0, 50)) * Math.PI) / 2;
     self.object3d.add(teapot);
   };
   var makeElbowJoint = function(fromPosition, toPosition, tangentVector) {
@@ -318,7 +319,7 @@ function clear(fast) {
   clearTimeout(clearTID);
   clearTID = setTimeout(
     clear,
-    rand(options.interval[0], options.interval[1]) * 1000
+    random(options.interval[0], options.interval[1]) * 1000
   );
   if (!clearing) {
     clearing = true;
@@ -328,7 +329,7 @@ function clear(fast) {
 }
 clearTID = setTimeout(
   clear,
-  rand(options.interval[0], options.interval[1]) * 1000
+  random(options.interval[0], options.interval[1]) * 1000
 );
 
 function reset() {
@@ -445,15 +446,15 @@ function animate() {
 function look() {
   // TODO: never don't change the view (except maybe while clearing)
   if (chance(1 / 2)) {
-    //head-on view
+    // head-on view
 
     camera.position.set(0, 0, 14);
   } else {
-    //random view
+    // random view
 
     var vector = new THREE.Vector3(14, 0, 0);
 
-    var axis = new THREE.Vector3(rand(-1, 1), rand(-1, 1), rand(-1, 1));
+    var axis = new THREE.Vector3(random(-1, 1), random(-1, 1), random(-1, 1));
     var angle = Math.PI / 2;
     var matrix = new THREE.Matrix4().makeRotationAxis(axis, angle);
 
@@ -542,14 +543,14 @@ animate();
 /**************\
 |boring helpers|
 \**************/
-function rand(x1, x2) {
+function random(x1, x2) {
   return Math.random() * (x2 - x1) + x1;
 }
-function integerRand(x1, x2) {
-  return Math.round(rand(x1, x2));
+function randomInteger(x1, x2) {
+  return Math.round(random(x1, x2));
 }
 function chance(value) {
-  return rand(0, 1) < value;
+  return Math.random() < value;
 }
 function chooseFrom(values) {
   return values[Math.floor(Math.random() * values.length)];
@@ -562,10 +563,10 @@ function shuffleArrayInPlace(array) {
     array[j] = temp;
   }
 }
-function integerRandomPointInBox(box) {
+function randomIntegerVector3WithinBox(box) {
   return new THREE.Vector3(
-    integerRand(box.min.x, box.max.x),
-    integerRand(box.min.y, box.max.y),
-    integerRand(box.min.z, box.max.z)
+    randomInteger(box.min.x, box.max.x),
+    randomInteger(box.min.y, box.max.y),
+    randomInteger(box.min.z, box.max.z)
   );
 }

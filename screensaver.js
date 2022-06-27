@@ -347,10 +347,10 @@ function clear(fast) {
     dissolve(fadeOutTime, reset);
   }
 }
-clearTID = setTimeout(
-  clear,
-  random(options.interval[0], options.interval[1]) * 1000
-);
+// clearTID = setTimeout(
+//   clear,
+//   random(options.interval[0], options.interval[1]) * 1000
+// );
 
 var boundingText = "Pipewriter";
 
@@ -581,6 +581,7 @@ toggleControlButton.addEventListener(
   },
   false
 );
+toggleControlButton.click();
 
 // parse URL parameters
 // support e.g. <iframe src="https://1j01.github.io/pipes/#{%22hideUI%22:true}"/>

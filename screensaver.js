@@ -3,14 +3,34 @@ var gridBounds = new THREE.Box3(
   new THREE.Vector3(10, 10, 10)
 );
 var nodes = {};
+var gridDebugSpheres = [];
+const debugSphereMaterial = new THREE.MeshPhongMaterial({
+  color: 0x00ff00,
+  specular: 0xa9fcff,
+  emissive: 0x003300,
+  shininess: 100,
+});
 function setAt(position, value) {
   nodes["(" + position.x + ", " + position.y + ", " + position.z + ")"] = value;
+  
+  const sphere = new THREE.Mesh(
+    new THREE.SphereGeometry(0.1, 2, 1),
+    debugSphereMaterial
+  );
+  sphere.position.copy(position);
+  scene.add(sphere);
+  gridDebugSpheres.push(sphere);
 }
 function getAt(position, value) {
   return nodes["(" + position.x + ", " + position.y + ", " + position.z + ")"];
 }
 function clearGrid() {
   nodes = {};
+  
+  for (var i = 0; i < gridDebugSpheres.length; i++) {
+    scene.remove(gridDebugSpheres[i]);
+  }
+  gridDebugSpheres = [];
 }
 
 var textures = {};
@@ -332,6 +352,8 @@ clearTID = setTimeout(
   random(options.interval[0], options.interval[1]) * 1000
 );
 
+var boundingText = "Pipewriter";
+
 function reset() {
   renderer.clear();
   for (var i = 0; i < pipes.length; i++) {
@@ -339,8 +361,36 @@ function reset() {
   }
   pipes = [];
   clearGrid();
+  if (boundingText) {
+    boundWithText(boundingText);
+  }
   look();
   clearing = false;
+}
+
+function boundWithText(text) {
+  // populate grid with inverse of text,
+  // so that pipes can go only inside the text
+
+  const canvas = document.createElement("canvas");
+  const ctx = canvas.getContext("2d");
+  // pipe collision uses gridBounds.containsPoint, which includes the border
+  // so we need to add one to the width and height, to match
+  canvas.width = gridBounds.max.x - gridBounds.min.x + 1;
+  canvas.height = gridBounds.max.y - gridBounds.min.y + 1;
+  ctx.font = `bold ${canvas.height}px Arial`;
+  ctx.fillStyle = "white";
+  ctx.fillText(text, 0, canvas.height);
+  const data = ctx.getImageData(0, 0, canvas.width, canvas.height).data;
+  for (var i = 0; i < data.length; i += 4) {
+    if (data[i + 3] < 128) {
+      const x = ((i/4) % canvas.width) + gridBounds.min.x;
+      const y = Math.floor((i/4) / canvas.width) + gridBounds.min.y;
+      for (let z = gridBounds.min.z; z <= gridBounds.max.z; z++) {
+        setAt(new THREE.Vector3(x, y, z), "TEXT_BOUND");
+      }
+    }
+  }
 }
 
 // this function is executed on each animation frame
@@ -466,7 +516,11 @@ function look() {
   // camera.updateProjectionMatrix(); // maybe?
   controls.update();
 }
+
 look();
+if (boundingText) {
+  boundWithText(boundingText);
+}
 
 addEventListener(
   "resize",

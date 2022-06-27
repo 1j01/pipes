@@ -33,6 +33,15 @@ function clearGrid() {
   gridDebugSpheres = [];
 }
 
+var possibleDirections = [
+  new THREE.Vector3(1, 0, 0),
+  new THREE.Vector3(-1, 0, 0),
+  new THREE.Vector3(0, 1, 0),
+  new THREE.Vector3(0, -1, 0),
+  new THREE.Vector3(0, 0, 1),
+  new THREE.Vector3(0, 0, -1),
+];
+
 var textures = {};
 var Pipe = function(scene, options) {
   var self = this;
@@ -181,7 +190,10 @@ var Pipe = function(scene, options) {
 
   makeBallJoint(self.currentPosition);
 
-  self.update = function() {
+  self.update = function () {
+    // Note: there are three positions in play here,
+    // [lastPosition, self.currentPosition, newPosition]
+    // and self.currentPosition must not be updated until the end of the update.
     if (self.positions.length > 1) {
       var lastPosition = self.positions[self.positions.length - 2];
       var lastDirectionVector = new THREE.Vector3().subVectors(
@@ -189,26 +201,38 @@ var Pipe = function(scene, options) {
         lastPosition
       );
     }
-    if (chance(1 / 2) && lastDirectionVector) {
-      var directionVector = lastDirectionVector;
-    } else {
-      var directionVector = new THREE.Vector3();
-      directionVector[chooseFrom("xyz")] += chooseFrom([+1, -1]);
+    var wantToTurn = chance(1 / 2);
+    var directionsToTry = [...possibleDirections];
+    shuffleArrayInPlace(directionsToTry);
+    if (lastDirectionVector && !wantToTurn) {
+      // non-unique array shouldn't matter, as long as we don't assume 6 directions to try
+      directionsToTry = [lastDirectionVector, ...directionsToTry];
     }
-    var newPosition = new THREE.Vector3().addVectors(
-      self.currentPosition,
-      directionVector
-    );
 
-    // TODO: try other possibilities
-    // ideally, have a pool of the 6 possible directions and try them in random order, removing them from the bag
-    // (and if there's truly nowhere to go, maybe make a ball joint)
-    if (!gridBounds.containsPoint(newPosition)) {
+    var foundValidDirection = false;
+    var directionVector;
+    var newPosition;
+    for (var i = 0; i < directionsToTry.length; i++) {
+      directionVector = directionsToTry[i];
+      newPosition = new THREE.Vector3().addVectors(
+        self.currentPosition,
+        directionVector
+      );
+      if (!gridBounds.containsPoint(newPosition)) {
+        continue;
+      }
+      if (getAt(newPosition)) {
+        continue;
+      }
+      foundValidDirection = true;
+      break;
+    }
+    if (!foundValidDirection) {
+      // makeBallJoint(self.currentPosition);
+      // TODO: make a ball joint and delete the pipe so it doesn't infinitely add balls in the same location
       return;
     }
-    if (getAt(newPosition)) {
-      return;
-    }
+
     setAt(newPosition, self);
 
     // joint

@@ -60,6 +60,7 @@ var Pipe = function(scene, options) {
   }
   if (getAt(self.currentPosition)) {
     console.warn("Could not find a valid position for the pipe");
+    self.alive = false;
   }
   self.positions = [self.currentPosition];
   self.object3d = new THREE.Object3D();
@@ -191,7 +192,9 @@ var Pipe = function(scene, options) {
   // }
   setAt(self.currentPosition, self);
 
-  makeBallJoint(self.currentPosition);
+  if (self.alive) {
+    makeBallJoint(self.currentPosition);
+  }
 
   self.update = function () {
     if (!self.alive) {
@@ -444,7 +447,7 @@ function animate() {
   for (var i = 0; i < pipes.length; i++) {
     pipes[i].update(scene);
   }
-  // pipes = pipes.filter((pipe) => pipe.alive);
+  pipes = pipes.filter((pipe) => pipe.alive);
   if (pipes.length === 0) {
     var jointType = options.joints;
     if (options.joints === JOINTS_CYCLE) {
@@ -467,7 +470,7 @@ function animate() {
         textures[pipeOptions.texturePath] = texture;
       }
     }
-    // TODO: create new pipes over time?
+    // TODO: create new pipes over time, other than when no pipes can move?
     for (var i = 0; i < 1 + options.multiple * (1 + chance(1 / 10)); i++) {
       pipes.push(new Pipe(scene, pipeOptions));
     }

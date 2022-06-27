@@ -51,6 +51,7 @@ var Pipe = function(scene, options) {
   var ballJointRadius = pipeRadius * 1.5;
   var teapotSize = ballJointRadius;
 
+  self.alive = true;
   self.currentPosition = randomIntegerVector3WithinBox(gridBounds);
   for (var i = 0; i < 1000; i++) {
     if (getAt(self.currentPosition)) {
@@ -193,6 +194,9 @@ var Pipe = function(scene, options) {
   makeBallJoint(self.currentPosition);
 
   self.update = function () {
+    if (!self.alive) {
+      return;
+    }
     // Note: there are three positions in play here,
     // [lastPosition, self.currentPosition, newPosition]
     // and self.currentPosition must not be updated until the end of the update.
@@ -230,8 +234,8 @@ var Pipe = function(scene, options) {
       break;
     }
     if (!foundValidDirection) {
-      // makeBallJoint(self.currentPosition);
-      // TODO: make a ball joint and delete the pipe so it doesn't infinitely add balls in the same location
+      makeBallJoint(self.currentPosition);
+      self.alive = false;
       return;
     }
 
@@ -440,6 +444,7 @@ function animate() {
   for (var i = 0; i < pipes.length; i++) {
     pipes[i].update(scene);
   }
+  // pipes = pipes.filter((pipe) => pipe.alive);
   if (pipes.length === 0) {
     var jointType = options.joints;
     if (options.joints === JOINTS_CYCLE) {

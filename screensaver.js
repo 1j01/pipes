@@ -1,9 +1,11 @@
 var gridBounds = new THREE.Box3(
-  new THREE.Vector3(-5, -5, -2),
-  new THREE.Vector3(5, 5, 2)
+  new THREE.Vector3(-35, -5, -2),
+  new THREE.Vector3(35, 10, 2)
 );
 var nodes = {};
 var gridDebug = false;
+// I could debug the grid much more efficiently with PointsMaterial,
+// but it's debug! It's meant to be slow.
 var gridDebugSpheres = [];
 const debugSphereMaterial = new THREE.MeshPhongMaterial({
   color: 0x00ff00,
@@ -422,9 +424,9 @@ function boundWithText(text) {
   // so we need to add one to the width and height, to match
   canvas.width = gridBounds.max.x - gridBounds.min.x + 1;
   canvas.height = gridBounds.max.y - gridBounds.min.y + 1;
-  ctx.font = `bold ${canvas.height}px Arial`;
+  ctx.font = `bold ${canvas.height * 0.8}px Arial`;
   ctx.fillStyle = "white";
-  ctx.fillText(text, 0, canvas.height);
+  ctx.fillText(text, 0, canvas.height * 0.7);
   const data = ctx.getImageData(0, 0, canvas.width, canvas.height).data;
   for (var i = 0; i < data.length; i += 4) {
     if (data[i + 3] < 128) {

@@ -3,6 +3,7 @@ var gridBounds = new THREE.Box3(
   new THREE.Vector3(5, 5, 2)
 );
 var nodes = {};
+var gridDebug = false;
 var gridDebugSpheres = [];
 const debugSphereMaterial = new THREE.MeshPhongMaterial({
   color: 0x00ff00,
@@ -15,13 +16,15 @@ const debugSphereMaterial = new THREE.MeshPhongMaterial({
 function setAt(position, value) {
   nodes["(" + position.x + ", " + position.y + ", " + position.z + ")"] = value;
   
-  const sphere = new THREE.Mesh(
-    new THREE.SphereGeometry(value === "TEXT_BOUND" ? 0.6 : 0.1, 6, 4),
-    debugSphereMaterial
-  );
-  sphere.position.copy(position);
-  scene.add(sphere);
-  gridDebugSpheres.push(sphere);
+  if (gridDebug) {
+    const sphere = new THREE.Mesh(
+      new THREE.SphereGeometry(value === "TEXT_BOUND" ? 0.6 : 0.1, 6, 4),
+      debugSphereMaterial
+    );
+    sphere.position.copy(position);
+    scene.add(sphere);
+    gridDebugSpheres.push(sphere);
+  }
 }
 function getAt(position, value) {
   return nodes["(" + position.x + ", " + position.y + ", " + position.z + ")"];

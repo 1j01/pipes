@@ -426,7 +426,7 @@ function boundWithText(text) {
   for (var i = 0; i < data.length; i += 4) {
     if (data[i + 3] < 128) {
       const x = ((i/4) % canvas.width) + gridBounds.min.x;
-      const y = Math.floor((i/4) / canvas.width) + gridBounds.min.y;
+      const y = canvas.height - (Math.floor((i / 4) / canvas.width)) + gridBounds.min.y - 1;
       for (let z = gridBounds.min.z; z <= gridBounds.max.z; z++) {
         setAt(new THREE.Vector3(x, y, z), "TEXT_BOUND");
       }

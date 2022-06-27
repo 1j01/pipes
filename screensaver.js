@@ -8,13 +8,15 @@ const debugSphereMaterial = new THREE.MeshPhongMaterial({
   color: 0x00ff00,
   specular: 0xa9fcff,
   emissive: 0x003300,
-  shininess: 100,
+  shininess: 5,
+  transparent: true,
+  opacity: 0.8
 });
 function setAt(position, value) {
   nodes["(" + position.x + ", " + position.y + ", " + position.z + ")"] = value;
   
   const sphere = new THREE.Mesh(
-    new THREE.SphereGeometry(0.1, 2, 1),
+    new THREE.SphereGeometry(value === "TEXT_BOUND" ? 0.6 : 0.1, 6, 4),
     debugSphereMaterial
   );
   sphere.position.copy(position);

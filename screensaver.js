@@ -41,6 +41,14 @@ var Pipe = function(scene, options) {
   var teapotSize = ballJointRadius;
 
   self.currentPosition = randomIntegerVector3WithinBox(gridBounds);
+  for (var i = 0; i < 1000; i++) {
+    if (getAt(self.currentPosition)) {
+      self.currentPosition = randomIntegerVector3WithinBox(gridBounds);
+    }
+  }
+  if (getAt(self.currentPosition)) {
+    console.warn("Could not find a valid position for the pipe");
+  }
   self.positions = [self.currentPosition];
   self.object3d = new THREE.Object3D();
   scene.add(self.object3d);

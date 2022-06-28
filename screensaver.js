@@ -1,6 +1,6 @@
 var gridBounds = new THREE.Box3(
   new THREE.Vector3(-35, -5, -2),
-  new THREE.Vector3(35, 10, 2)
+  new THREE.Vector3(35, 10, 0)
 );
 var nodes = {};
 var gridDebug = false;

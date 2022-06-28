@@ -452,8 +452,8 @@ function animate() {
   for (var i = 0; i < pipes.length; i++) {
     pipes[i].update(scene);
   }
-  pipes = pipes.filter((pipe) => pipe.alive);
-  if (pipes.length === 0) {
+  // if (pipes.some((pipe) => pipe.alive)) { would not work if there are no pipes
+  if (pipes.every((pipe) => !pipe.alive)) {
     var jointType = options.joints;
     if (options.joints === JOINTS_CYCLE) {
       jointType = jointsCycleArray[jointsCycleIndex++];

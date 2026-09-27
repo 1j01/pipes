@@ -65,9 +65,27 @@
       .controls td {
         padding: 10px;
       }
-      .controls > button,
-      .controls > label {
+      .controls > button {
         margin: 10px;
+      }
+      [hidden] {
+        display: none !important;
+      }
+      .settings {
+        display: grid;
+        grid-template-columns: auto auto;
+        align-items: center;
+        gap: 8px 12px;
+        margin: 10px;
+      }
+      .settings .slider,
+      .settings .texture {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+      }
+      .settings output {
+        min-width: 3.5em;
       }
       button {
         border: 1px solid gray;
@@ -114,15 +132,66 @@
         </svg>
         Enter Fullscreen
       </button>
-      <label>
-        Joint Type:
+      <div class="settings">
+        <label for="joint-types">Joint type</label>
         <select id="joint-types">
           <option value="elbow">Elbow</option>
           <option value="ball">Ball</option>
-          <option value="mixed" selected>Mixed</option>
+          <option value="mixed">Mixed</option>
           <option value="cycle">Cycle</option>
         </select>
-      </label>
+
+        <label for="speed">Speed</label>
+        <span class="slider">
+          <input id="speed" type="range" min="0" max="100" step="any" />
+          <output id="speed-output" for="speed"></output>
+        </span>
+
+        <label for="zoom">Zoom</label>
+        <span class="slider">
+          <input id="zoom" type="range" min="0.5" max="3" step="0.1" />
+          <output id="zoom-output" for="zoom"></output>
+        </span>
+
+        <label for="palette">Colors</label>
+        <select id="palette">
+          <option value="random">Random</option>
+          <option value="classic">Classic</option>
+          <option value="materials">Gems, metals &amp; plastics</option>
+        </select>
+
+        <label for="texture">Texture</label>
+        <span class="texture">
+          <select id="texture">
+            <option value="none">None</option>
+            <option value="rusty">Rusty</option>
+            <option value="custom">Custom</option>
+          </select>
+          <button id="add-textures" title="Or drop image files anywhere">
+            Add images…
+          </button>
+          <button id="remove-textures" hidden>Remove</button>
+          <input
+            id="texture-file-input"
+            type="file"
+            accept="image/*"
+            multiple
+            hidden
+          />
+        </span>
+
+        <label for="transition">Transition</label>
+        <select id="transition">
+          <option value="dissolve">Dissolve</option>
+          <option value="fade">Fade</option>
+        </select>
+
+        <label for="camera">Camera</label>
+        <select id="camera">
+          <option value="static">Still</option>
+          <option value="rotate">Rotate</option>
+        </select>
+      </div>
       <button id="toggle-controls">
         <span class="normal-controls-enabled">Control Camera</span>
         <span hidden class="orbit-controls-enabled">Relinquish Camera</span>
@@ -142,6 +211,10 @@
           <tr class="normal-controls-enabled">
             <td>Secondary</td>
             <td>Clear pipes and restart</td>
+          </tr>
+          <tr class="normal-controls-enabled">
+            <td>Wheel</td>
+            <td>Zoom</td>
           </tr>
           <tr hidden class="orbit-controls-enabled">
             <td>Primary (Drag)</td>

@@ -10,31 +10,42 @@ It's also included in [98.js.org](https://98.js.org/) as a program you can run.
 
 [![](images/meta/screencap.gif)](https://1j01.github.io/pipes/)
 
-(This screen capture GIF is outdated. It now avoids collisions between pipes and implements the dissolve effect for fading out.)
+(This screen capture GIF is outdated. It now avoids collisions between pipes, has curved elbow joints, fades out between scenes, and has more options.)
+
+## Options
+
+The panel in the top left lets you change the joint type, speed, zoom, colors, texture, the transition between scenes (dissolve or fade), and the camera (still or slowly rotating). The mouse wheel zooms too. Your choices are saved in the browser.
+
+You can also drop image files anywhere on the page (or use **Add images…**) to use them as pipe textures; with several, each pipe gets a different one.
+
+Options can be given in the URL as JSON after the `#`, which is handy for embedding. These apply only to that page view and aren't saved:
+
+```html
+<iframe
+  src="https://1j01.github.io/pipes/#{%22hideUI%22:true,%22speed%22:20,%22transition%22:%22fade%22}"
+></iframe>
+```
+
+| Option       | Values                                             | Default      |
+| ------------ | -------------------------------------------------- | ------------ |
+| `joints`     | `"elbow"`, `"ball"`, `"mixed"`, `"cycle"`          | `"mixed"`    |
+| `speed`      | pipe segments per second, `2` to `300`             | `60`         |
+| `zoom`       | `0.5` to `3`; at `1` the whole grid fits on screen | `1.5`        |
+| `palette`    | `"random"`, `"classic"`, `"materials"`             | `"random"`   |
+| `texture`    | `"none"`, `"rusty"`, `"custom"`\*                  | `"none"`     |
+| `transition` | `"dissolve"`, `"fade"`                             | `"dissolve"` |
+| `camera`     | `"static"`, `"rotate"`                             | `"static"`   |
+| `hideUI`     | `true`, `false`                                    | `false`      |
+
+\* `"custom"` uses images you've added; until you add some, pipes are colored as usual.
 
 ## TODO
-
-- Add back smooth fade out as an option, now that a dissolve effect is implemented
-
-- Add control for speed
 
 - Animate sections into existence, emulating CPU graphics where the triangles were drawn progressively and the screen updated in between "frames" (optionally)
 
 - Improve lighting (the original was less shiny), or at least avoid unflattering camera angles
 
-- Use a palette (what palette? please help with this)
-
-- Extra camera functions like continuous rotation, maybe even following the pipes like a rollercoaster
-
-- Allow moving camera during dissolve transition (it's kinda unpleasant how it stops you (abruptly), and the effect is implemented as an overlay anyways)
-
-- Save options to local storage, or maybe in the URL
-
-- Custom textures with drag and drop (and also a file input)
-  (can accept multiple textures, for it to choose from randomly (pulling from a bag and not replacing them))
-
-- Proper elbow joints (currently uses a sphere (smaller than the ball joint so it doesn't stick out) rather than a section of a torus);
-  could use [spline extrusion](https://threejs.org/examples/#webgl_geometry_extrude_splines) rather than trying to align a torus section every which way (if it actually helps)
+- Extra camera functions like following the pipes like a rollercoaster
 
 - Implement different behavioral characteristics between pipes
 
@@ -85,4 +96,4 @@ The source code for the original OpenGL screensavers can be found in [a version 
 
 ### Project Structure
 
-All the good stuff is in `screensaver.js`
+All the good stuff is in `screensaver.js`, in sections: options (defaults, saved choices and URL parameters), the grid, textures, materials, the `Pipe` itself, the scene and camera, transitions, scene cycling, the animation loop, and the UI.
